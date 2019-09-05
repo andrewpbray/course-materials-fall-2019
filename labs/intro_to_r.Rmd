@@ -127,8 +127,7 @@ the first argument of the function in the following one.
 To continue our analogy with mathematical functions, `x %>% f(y)` is 
 equivalent to `f(x, y)`.
 
-<div id="boxedtext">
-**A note on piping: ** Note that we can read these three lines of code as the following: 
+**A note on piping:** Note that we can read these three lines of code as the following: 
 
 *"Take the `arbuthnot` dataset and **pipe** it into the `mutate` function. 
 Mutate the `arbuthnot` data set by creating a new variable called `total` that is the sum of the variables
@@ -139,12 +138,6 @@ containing the new variable."*
 This is equivalent to going through each row and adding up the `boys` 
 and `girls` counts for that year and recording that value in a new column called
 `total`.
-</div>
-
-<div id="boxedtext">
-**Where is the new variable? ** When you make changes to variables in your dataset, 
-click on the name of the dataset again to update it in the data viewer.
-</div>
 
 You'll see that there is now a new column called `total` that has been tacked on
 to the data frame. The special symbol `<-` performs an *assignment*, taking the 
@@ -188,14 +181,7 @@ arbuthnot <- arbuthnot %>%
 
 Note that we are using the new `total` variable we created earlier in our calculations.
 
-3. Now, generate a plot of the proportion of boys born over time. What do you see? 
-
-<div id="boxedtext">
-**Tip: ** If you use the up and down arrow keys, you can scroll through your 
-previous commands, your so-called command history. You can also access it 
-by clicking on the history tab in the upper right panel. This will save 
-you a lot of typing in the future.
-</div>
+3. Now, generate a plot of the proportion of boys born over time. What do you see?
 
 Finally, in addition to simple mathematical operators like subtraction and 
 division, you can ask R to make comparisons like greater than, `>`, less than,
