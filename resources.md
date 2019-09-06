@@ -18,11 +18,7 @@ Other resources:
 
 #### R
 - [Datacamp: Intro to R Course](https://www.datacamp.com/courses/free-introduction-to-r)
-- [swirl: Learn R, in R](http://swirlstats.com/)
 - [Cookbook for R](http://www.cookbook-r.com/)
-- [RStudio IDE Cheatsheet](http://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf)
-- [Getting Started with `qplot`](http://docs.ggplot2.org/dev/vignettes/qplot.html)
-- [`qplot` Function Arguments](http://www.statmethods.net/advgraphs/ggplot2.html)
-- [Visualization Cheatsheet (ggplot2)](http://www.rstudio.com/wp-content/uploads/2015/12/ggplot2-cheatsheet-2.0.pdf)
-- [Data Wrangling Cheatsheet (dplyr)](http://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
-- [How to Get RStudio Set Up on Your Own Machine (Mac)](http://www.reed.edu/data-at-reed/software/R/r_studio.html)
+- [RStudio IDE Cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/rstudio-ide.pdf)
+- [Visualization Cheatsheet (ggplot2)](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)
+- [Data Wrangling Cheatsheet (dplyr)](https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf)
