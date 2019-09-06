@@ -29,7 +29,7 @@ of applications from the natural and social sciences will be used.
 [OpenIntro: Introductory Statistics with Randomization and Simulation](https://www.openintro.org/stat/textbook.php?stat_book=isrs) (2014),
 by Diez, Barr and Çetinkaya-Rundel, available in three formats: pdf, 
 tablet-friendly pdf, and paperback edition. The textbook is free and open-source,
-but you're encouraged to purchase the paperback edition through Amazon for < $10.
+but you're encouraged to purchase the paperback edition for roughly $10.
 The textbook is a key component of the course.
 
 ### Class components
