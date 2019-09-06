@@ -1,3 +1,3 @@
-# Introduction to Probably and Statistics
+# Introduction to Probability and Statistics
 
 
