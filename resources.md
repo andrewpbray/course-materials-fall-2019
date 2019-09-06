@@ -8,7 +8,7 @@ Your first stop for any help related to computing with data should be this book:
 
 Other resources:
 
-#### RMarkdown
+### RMarkdown
 - [Reproducible Research through R Markdown](https://prezi.com/dvmgx17e_was/reproducible/)
 - [Intro to Markdown (video)](https://www.youtube.com/watch?v=HndN6P9ke6U)
 - [R Markdown with RStudio (video)](https://www.youtube.com/watch?v=DNS7i2m4sB0)
@@ -16,7 +16,7 @@ Other resources:
 - [Reproducibility Guide](http://ropensci.github.io/reproducibility-guide/)
 
 
-#### R
+### R
 - [Datacamp: Intro to R Course](https://www.datacamp.com/courses/free-introduction-to-r)
 - [Cookbook for R](http://www.cookbook-r.com/)
 - [RStudio IDE Cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/rstudio-ide.pdf)
