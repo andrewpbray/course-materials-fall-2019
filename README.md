@@ -14,33 +14,15 @@ No class
 
 ### Thursday Lab
 
-Intro to R
+Intro to R (due next Monday 11:59 pm)
 
 ### Friday
+
+- Notes on the lab
+- Course Logistics
+- Data Collection for Inference
 
 **For next time**
-
 - Join slack group/channel and count off
-- Take survey
-- Read
-- Work on Practicum
-
-* * *
-
-## Week 2
-
-### Monday
-
-
-
-### Wednesday
-
-
-
-### Thursday Lab
-
-
-
-### Friday
-
-
+- Read p. 1 - 16
+- Work on Lab, Problem Set
