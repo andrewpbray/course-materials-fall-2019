@@ -1,8 +1,4 @@
----
-layout: page
-title: Syllabus
-permalink: /syllabus/
----
+# Syllabus
 
 Welcome to the Age of Data, where information is all around us, helping us live 
 happier, healthier lives. Or does it? Do we know yet if cell phones cause 

@@ -1,10 +1,6 @@
----
-layout: page
-title: Resources
-permalink: /resources/
----
+# Resources
 
-All of the slides for this course can be accessed via [github](https://github.com/andrewpbray/math-141) in the *assets* folder. All of the communication will take place in our [slack group](https://math-141-f17.slack.com/).
+All of the slides for this course can be accessed via the *slides* folder. All of the communication will take place in our # math-141-andrew channel in our [slack group](https://reed-stats-ds.slack.com/).
 
 Your first stop for any help related to computing with data should be this book:
 
