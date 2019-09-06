@@ -21,8 +21,7 @@ Intro to R (due next Monday 11:59 pm)
 - Notes on the lab
 - Course Logistics
 - Data Collection for Inference
-
-**For next time**
-- Join slack group/channel and count off
-- Read p. 1 - 16
-- Work on Lab, Problem Set
+- **For next time**
+    - Join slack group/channel and count off
+    - Read p. 1 - 16
+    - Work on Lab, Problem Set
