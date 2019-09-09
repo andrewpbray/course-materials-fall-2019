@@ -36,7 +36,7 @@ Intro to R (due next Monday 11:59 pm)
 
 ### Wednesday
 
-- Princples of Data Collection (cont.)
+- Principles of Data Collection (cont.)
 
 ### Thursday Lab
 
