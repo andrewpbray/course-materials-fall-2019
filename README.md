@@ -32,11 +32,15 @@ Intro to R (due next Monday 11:59 pm)
 ### Monday
 
 - Principles of Data Collection ([slides](https://github.com/intro-stats/course-materials/blob/master/slides/week-02/data-collection.pdf))
-- Lab 1 due tonight at Midnight
+- **For next time**
+    - Lab 1 due tonight at 11:59 pm
+    - Read p. 17 - 19
 
 ### Wednesday
 
 - Principles of Data Collection (cont.)
+- **For next time**
+    - Read p. 20 - 42
 
 ### Thursday Lab
 
