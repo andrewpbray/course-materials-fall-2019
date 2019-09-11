@@ -12,11 +12,91 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.retina = 3)
 library(ggplot2)
+library(mosaic)
 library(dplyr)
 ```
 
+# Prelude: Sampling
+
+```{r strat-samp}
+teams <- c(rep("yankees", 40), 
+           rep("padres", 40), 
+           rep("mariners", 40), 
+           rep("dodgers", 40))
+salary <- c(rnorm(40, mean = 25), 
+            rnorm(40, 16), 
+            rnorm(40, 23), 
+            rnorm(40, 15))
+df <- data.frame(teams, salary)
+head(df)
+```
+
+---
+# Population view
+
+```{r plot-strat, echo = FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.align='center'}
+ggplot(df, aes(x = salary, color = teams)) + 
+  geom_density() +
+  geom_rug() +
+  theme_bw()
+```
+
+---
+# Simple Random Sample (SRS)
+
+```{r sim}
+# population mean
+mean(df$salary)
+# SRS
+df %>% sample_n(40) %>% summarize(mean(salary))
+```
+
+---
+# Stratified Sample
+
+```{r}
+# Stratified sample
+df %>% 
+  group_by(teams) %>% 
+  sample_n(10) %>% 
+  ungroup() %>%
+  summarize(mean(salary))
+```
+
+---
+# Long-run performance
+
+```{r comp, echo=FALSE, message = FALSE, fig.align='center', fig.width = 9}
+SRS <- do(1000) * mean(~salary, data = sample(df, 40))
+STR <- do(1000) * mean(~salary, data = rbind(sample(subset(df, teams == "yankees"), 10),
+                                             sample(subset(df, teams == "padres"), 10),
+                                             sample(subset(df, teams == "mariners"), 10),
+                                             sample(subset(df, teams == "dodgers"), 10)))
+sim <- data.frame(salary = rbind(SRS, STR), method = rep(c("SRS", "STR"), each = 1000))
+ggplot(sim, aes(x = mean, color = method)) +
+  geom_density() +
+  annotate("segment", x = mean(df$salary), xend = mean(df$salary),
+           y = 0, yend = 3, color = "darkgrey", linetype = 2)
+```
+
+---
+# Sampling Strategies
+
+--
+
+**SRS**: Unbiased, easy, but can be high variance.
+
+--
+
+**Stratfied Sampling**: Divide population into strata that are *similar* within and *different* between. Draw SRS from within each strata.
+
+
+---
+# Back to Experimental Design
+
+---
 
 ```{r out.width=800, echo = FALSE, fig.align='center'}
 knitr::include_graphics("figs/corrs1.png")
