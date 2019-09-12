@@ -90,7 +90,7 @@ ggplot(sim, aes(x = mean, color = method)) +
 
 --
 
-**Stratfied Sampling**: Divide population into strata that are *similar* within and *different* between. Draw SRS from within each strata.
+**Stratified Sampling**: Divide population into strata that are *similar* within and *different* between. Draw SRS from within each strata.
 
 
 ---
