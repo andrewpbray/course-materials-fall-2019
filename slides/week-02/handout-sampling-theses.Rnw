@@ -37,7 +37,7 @@ Your objective is to learn as much about senior theses checkout patterns as you 
 \begin{enumerate}
 \item What organizational scheme do the theses follow in the tower?
 \vspace{20mm}
-\item  Are there any additional bits of information that you are interested in recording? What is the final list of variables that you recorded on each thesis?
+\item Please do your best to estimate the total number of theses in the tower.
 \vspace{20mm}
 \item Please provide a detailed plan of how  you will collect a sample of data that is representative and efficient? You might consider using a simple random sample, stratified sampling, or cluster sampling. Your plan should be explicit enough that someone else could follow in your footsteps next semester and know how to collect a sample in an identical manner.
 \end{enumerate}
@@ -53,12 +53,6 @@ Now is your opportunity to draw a sample of theses and record the variables of i
 
 Each group will have their data in a different sheet of this google doc. Click the plus in the lower-left corner to add a new sheet, rename it based on your team number, then fill in the column names and the data values.
 
-To make life easier down the line, please:
-
-\begin{itemize}
-\item Use all lower case letters
-\item Use hyphens instead of spaces
-\item Follow the division name guidelines
-\end{itemize}
+To make life easier down the line, please follow the division name guidelines on the first example sheet.
 
 \end{document}
