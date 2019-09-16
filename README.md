@@ -49,4 +49,29 @@ Intro to R (due next Monday 11:59 pm)
 ### Friday
 
 - Problem Set 1 due in class
+- Sample theses debrief
+
+
+## Week 3
+
+### Monday
+
 - Describing data
+- **For next time**
+    - Work on PS 2 to prep for quiz
+    - Read p. 295 - 306
+
+### Wednesday
+
+- Quiz: Data collection for inference, describing data
+- Probability I
+- **For next time**
+    - Read p. 306 - 323
+
+### Thursday Lab
+
+- Data Visualization with ggplot
+
+### Friday
+
+- Probability II
