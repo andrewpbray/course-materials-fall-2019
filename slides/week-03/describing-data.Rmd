@@ -166,7 +166,9 @@ var(X)
 **Sample standard deviation**: the square root of the variance. Used because
 units are the same as the data.
 
-\[ s = \sqrt(s^2) \]
+$$
+s = \sqrt(s^2)
+$$
 
 ```{r}
 sqrt(var(X))
@@ -181,7 +183,9 @@ Compared to the *population standard deviation*, $\sigma$.
 
 **Inner Quartile Range**: the range of the middle 50% of the data.
 
-\[ IQR = Q3 - Q1 \]
+$$
+IQR = Q3 - Q1
+$$
 
 ```{r}
 sort(X)
@@ -194,7 +198,9 @@ IQR(X)
 
 **Range**: the range of the full data set.
 
-\[ range = max - min \]
+$$
+range = max - min
+$$
 
 ```{r}
 max(X) - min(X)
