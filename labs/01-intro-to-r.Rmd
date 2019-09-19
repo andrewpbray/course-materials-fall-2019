@@ -1,12 +1,6 @@
 ---
 title: "Lab 1: Introduction to R and RStudio"
-output:
-  github_document
-    # css: ../lab.css
-    # highlight: pygments
-    # theme: cerulean
-    # toc: true
-    # toc_float: true
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
