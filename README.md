@@ -75,3 +75,31 @@ Intro to R (due next Monday 11:59 pm)
 ### Friday
 
 - Probability II
+- **For next time**
+    - Lab 3 due Monday 11:59 pm
+    
+    
+## Week 4
+
+### Monday
+
+- Conditional Probability
+- **For next time**
+    - Work on PS 3
+
+### Wednesday
+
+- Random Variables
+- **For next time**
+    - PS 3 due beginning of class Friday
+
+### Thursday Lab
+
+- Data Wrangling with dplyr
+
+### Friday
+
+- Foundational Distributions
+- Quiz: Probability
+- **For next time**
+    - Lab 4 due Monday 11:59 pm
