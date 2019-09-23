@@ -16,4 +16,4 @@ Problem sets are practice. A good problem set will not only have the correct ans
 
 **PS2**: Please work through problems 24, 26, 40, and 47 in the Exercises at the end of Chapter 1.
 
-**PS3**: Exercises in probability ([link to pdf](https://github.com/intro-stats/course-materials/slides/week-04/ps-3.pdf).
+**PS3**: Exercises in probability ([link to pdf](https://github.com/intro-stats/course-materials/blob/master/slides/week-04/ps-3.pdf)).
