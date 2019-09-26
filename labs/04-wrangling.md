@@ -45,21 +45,30 @@ which is coded according to the following system.
 1.  Describe the distribution of departure delays for all flights using
     a histogram and appropriate summary statistics.
 
-2.  Mutate the data frame so that it includes a new variable that
-    contains the average speed, `avg_speed` traveled by the plane for
-    each flight (in mph). Create a scatterplot of average speed
-    vs. distance and describe the relationship. **Hint:** Average speed
-    can be calculated as distance divided by number of hours of travel,
-    and note that `air_time` is given in minutes.
+2.  Create a new data frame that includes flights headed to SFO in
+    February, and save this data frame as `sfo_feb_flights`. How many
+    flights meet these criteria?
 
-3.  What proportion of the flights left from Portland? What is their
+3.  Returning to the full data frame, mutate it to include a new
+    variable that contains the average speed, `avg_speed` traveled by
+    the plane for each flight (in mph). Create a scatterplot of average
+    speed vs. distance and describe the relationship. **Hint:** Average
+    speed can be calculated as distance divided by number of hours of
+    travel, and note that `air_time` is given in minutes.
+
+4.  What proportion of the flights left from Portland? What is their
     most common destination? Most distant destination?
 
-4.  Create a dataframe that contains the median and interquartile range
+5.  Create a dataframe that contains the median and interquartile range
     for departure delays, grouped by carrier. Which carrier has the
     least variable departure delays?
 
-5.  Using the airport nearest your hometown, which day of the week and
+6.  For flights leaving PDX, which month has the highest average
+    departure delay? What about the highest median departure delay?
+    Which of these measures is more reliable for deciding which month(s)
+    to avoid flying if you really dislike delayed flights?
+
+7.  Using the airport nearest your hometown, which day of the week and
     which airline seems best for flying there from Portland? Be clear on
     how you’re defining *best*. (note that there is no explicit weekday
     column in this data set, but there is sufficient information to
@@ -74,12 +83,6 @@ which is coded according to the following system.
 mutate(day_of_week = wday(ymd(paste(year, month, day, set = "-")), label = T))
 ```
 
-6.  Let’s consider any flight which has a departure delay of less than
-    five minutes to be “on time,” and flights that are delayed for more
-    than 5 minutes to be actually “delayed.” Given that, which month has
-    the lowest proportion of delayed flights? **Hint:** Create a new
-    variable that takes “on\_time” and “delayed” as values.
-
 7.  The plot below displays the relationship between the mean arrival
     delay and the mean distance traveled by every plane in the data set.
     It also shows the total number of flights made by each plane by the
@@ -90,4 +93,4 @@ mutate(day_of_week = wday(ymd(paste(year, month, day, set = "-")), label = T))
     of less than 2000 miles. The points can be made transparent by
     adding an argument to `geom_point()`: `alpha = .1`.
 
-![](04-wrangling_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](04-wrangling_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
