@@ -103,3 +103,26 @@ Intro to R (due next Monday 11:59 pm)
 - Quiz: Probability
 - **For next time**
     - Lab 4 due Monday 11:59 pm
+    
+    
+## Week 5
+
+### Monday
+
+- Statistical Inference: Is Yawning Contagious?
+- **For next time**
+    - Read p. 61 - 81
+
+### Wednesday
+
+- Hypothesis Testing and p-values
+- **For next time**
+
+### Thursday Lab
+
+- TBD
+
+### Friday
+
+- Inference on Proportions
+- **For next time**
