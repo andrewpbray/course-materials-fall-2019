@@ -1,0 +1,12 @@
+---
+title: "Lab 5: Hypothesis Testing"
+output: github_document
+---
+
+
+
+* * *
+
+# Problem Set
+
+Please work through problems 1, 2, 3, 5, and 10 in the Exercises at the end of Chapter 2.
