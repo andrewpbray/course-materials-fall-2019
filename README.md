@@ -115,14 +115,20 @@ Intro to R (due next Monday 11:59 pm)
 
 ### Wednesday
 
-- Hypothesis Testing and p-values
+- Hypothesis Testing via Randomization
+    - Hypotheses
+    - p-values
 - **For next time**
+    - Start into problems for Lab 5.
 
 ### Thursday Lab
 
-- TBD
+- Lab 5 Benford's Law
 
 ### Friday
-
-- Inference on Proportions
+- Hypothesis Testing by other means
+    - Simulation
+    - Exact probability
+    - Normal Distribution
 - **For next time**
+    - Lab 5 due Monday 11:59 pm (along with problems)
