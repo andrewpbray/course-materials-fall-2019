@@ -95,9 +95,8 @@ method on data collected from the 2016 US presidential election.
 The [OpenElections](http://www.openelections.net) project is obtaining
 and standardizing precinct-level results from the 2016 US presidential
 election, among other US elections. To access the data, search
-OpenElections’ [GitHub
-page](https://github.com/openelections/tracker/blob/master/state_status_2016.csv)
-and pick an election that is marked “CSV” or “baked raw”.
+OpenElections’ [GitHub page](https://github.com/openelections) and pick
+an election that is marked “CSV” or “baked raw”.
 
 3.  Pick a state and use this data to create a plot of that state’s
     first digit distribution by precinct. Use the number of votes cast
