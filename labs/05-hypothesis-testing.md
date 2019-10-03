@@ -22,7 +22,8 @@ of cities, and election results have all been observed by different
 groups to follow Benford’s law.
 
 ``` r
-benfords_p <- data.frame(1:9, log10(1 + 1/1:9))
+benfords_p <- data.frame(first_digit = 1:9, 
+                         ben_prop = log10(1 + 1/1:9))
 ```
 
 ![](05-hypothesis-testing_files/figure-gfm/benford_plot-1.png)<!-- -->
