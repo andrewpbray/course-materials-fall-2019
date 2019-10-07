@@ -153,6 +153,7 @@ Intro to R (due next Monday 11:59 pm)
 
 ### Thursday Lab
 
+- *Office hours moved to Friday 2:30 - 3:30*
 - Lab 5 Inference for Categorial Data
 
 ### Friday
