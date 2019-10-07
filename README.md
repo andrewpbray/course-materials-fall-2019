@@ -132,3 +132,31 @@ Intro to R (due next Monday 11:59 pm)
     - Normal Distribution
 - **For next time**
     - Lab 5 due Monday 11:59 pm (along with problems)
+    
+
+## Week 6
+
+### Monday
+
+- Hypothesis Testing by other means, cont.
+    - Exact probability
+    - Normal Distribution
+- Properties of the Normal Distribution
+- **For next time**
+    - Read p. 81 - 102
+
+### Wednesday
+
+- Statistical Errors
+- **For next time**
+    - Read p. 102 - 107, 123 - 134
+
+### Thursday Lab
+
+- Lab 5 Inference for Categorial Data
+
+### Friday
+- Confidence Intervals
+   - One and two proportions
+- **For next time**
+    - Lab 6 due Monday 11:59 pm (along with problems)
