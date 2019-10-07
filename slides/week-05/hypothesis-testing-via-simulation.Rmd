@@ -1,0 +1,209 @@
+---
+title: "Hypothesis Testing via Simulation"
+output:
+  xaringan::moon_reader:
+    css: ["fc", "fc-fonts", "reed.css", "default"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+library(knitr)
+options(digits=2)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+# The Data
+
+--
+
+```{r dat, message = FALSE, eval = FALSE}
+library(tidyverse)
+d <- tibble(favor = rep(c("yes", "no"), c(50, 25)))
+d
+```
+
+--
+
+```{r ref.label = "dat", message = FALSE, echo = FALSE}
+library(tidyverse)
+d <- tibble(favor = rep(c("yes", "no"), c(50, 25)))
+d
+```
+
+---
+
+# The Observed Statistic
+
+```{r}
+d %>%
+  summarize(prop_yes = mean(favor == "yes"))
+```
+
+--
+
+```{r}
+library(infer)
+d %>%
+  specify(response = favor, success = "yes") %>%
+  calculate(stat = "prop")
+```
+
+---
+
+# The Observed Statistic, cont.
+
+```{r phat}
+p_hat <- d %>%
+  specify(response = favor, success = "yes") %>%
+  calculate(stat = "prop") %>%
+  pull() #<<
+```
+
+--
+
+```{r}
+p_hat
+```
+
+
+---
+# The Hypotheses
+
+Let $p$ be the true proportion of Americans who favor same-sex marriage.
+
+$$H_0: p = 0.5$$
+
+$$H_A: p \ne 0.5$$
+--
+
+```{r hypo, eval = FALSE}
+d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5) #<<
+```
+
+--
+
+```{r ref.label = "hypo", echo = FALSE}
+d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5)
+```
+
+---
+# The Simulation
+
+```{r sim, eval = FALSE}
+d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 10000, type = "simulate") #<<
+```
+
+--
+```{r ref.label = "sim", echo = FALSE}
+d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 10000, type = "simulate")
+```
+
+---
+
+# The Null Distribution of Statistics
+
+```{r calc, eval = FALSE}
+d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 10000, type = "simulate") %>%
+  calculate(stat = "prop") #<<
+```
+
+--
+
+```{r ref.label = "calc", echo = FALSE}
+d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 10000, type = "simulate") %>%
+  calculate(stat = "prop")
+```
+
+
+---
+
+# Visualizing the Null
+
+--
+
+```{r}
+null <- d %>%
+  specify(response = favor, success = "yes") %>%
+  hypothesize(null = "point", p = .5) %>%
+  generate(reps = 10000, type = "simulate") %>%
+  calculate(stat = "prop")
+```
+
+--
+
+```{r viz, eval = FALSE}
+null %>%
+  visualize() #<<
+```
+
+--
+
+```{r ref.label = "viz", echo = FALSE, fig.align='center', fig.height = 3}
+null %>%
+  visualize
+```
+
+
+---
+# `visualize()` is a `ggplot`
+
+--
+
+```{r pval, eval = FALSE}
+null %>%
+  visualize() +
+  shade_p_value(obs_stat = p_hat,   #<<
+                direction = "both") #<<
+```
+
+--
+
+```{r ref.label="pval", echo = FALSE, fig.align="center", fig.height = 4.5}
+null %>%
+  visualize() +
+  shade_p_value(obs_stat = p_hat, direction = "both")
+```
+
+---
+# Computing a p-value
+
+--
+
+```{r getpval, eval = FALSE}
+null %>%
+  get_p_value(obs_stat = p_hat,   #<<
+              direction = "both") #<<
+```
+
+--
+
+```{r ref.label = "getpval", echo = FALSE}
+null %>%
+  get_p_value(obs_stat = p_hat,   #<<
+              direction = "both") #<<
+```
+
