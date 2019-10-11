@@ -146,7 +146,7 @@ Intro to R (due next Monday 11:59 pm)
 
 ### Wednesday
 - Properties of the Normal Distribution
-
+- Practice with the Normal
 - **For next time**
     - Read p. 102 - 107, 123 - 134
 
@@ -156,6 +156,8 @@ Intro to R (due next Monday 11:59 pm)
 - Lab 5 Inference for Categorial Data
 
 ### Friday
+- Review practice with Normal
+- Metaphor II: Plato's Cave
 - Statistical Errors
 - **For next time**
     - Lab 6 due Monday 11:59 pm (along with problems)
