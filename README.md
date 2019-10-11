@@ -141,13 +141,12 @@ Intro to R (due next Monday 11:59 pm)
 - Hypothesis Testing by other means, cont.
     - Exact probability
     - Normal Distribution
-- Properties of the Normal Distribution
 - **For next time**
     - Read p. 81 - 102
 
 ### Wednesday
+- Properties of the Normal Distribution
 
-- Statistical Errors
 - **For next time**
     - Read p. 102 - 107, 123 - 134
 
@@ -157,7 +156,6 @@ Intro to R (due next Monday 11:59 pm)
 - Lab 5 Inference for Categorial Data
 
 ### Friday
-- Confidence Intervals
-   - One and two proportions
+- Statistical Errors
 - **For next time**
     - Lab 6 due Monday 11:59 pm (along with problems)
