@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Confidence Intervals for p</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Confidence Intervals for p
+
+---
+
+
+
+
+
+&lt;img src="figs/pew1.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/pew2.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/pew3.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+Boardwork
+
+---
+# Pew Data
+
+
+```r
+pew &lt;- data.frame(party = "Republican",
+                  closed = rep(c("yes", "no"),
+                                     c(3166, 1781)))
+head(pew)
+```
+
+--
+
+
+```
+##        party closed
+## 1 Republican    yes
+## 2 Republican    yes
+## 3 Republican    yes
+## 4 Republican    yes
+## 5 Republican    yes
+## 6 Republican    yes
+```
+
+---
+# Bootstrapping p-hat I
+
+
+```r
+pew %&gt;%
+  specify(response = closed, success = "yes") %&gt;%
+  generate(reps = 100, type = "bootstrap") 
+```
+
+--
+
+
+```
+## Response: closed (factor)
+## # A tibble: 494,700 x 2
+## # Groups:   replicate [100]
+##    replicate closed
+##        &lt;int&gt; &lt;fct&gt; 
+##  1         1 no    
+##  2         1 yes   
+##  3         1 no    
+##  4         1 yes   
+##  5         1 yes   
+##  6         1 yes   
+##  7         1 no    
+##  8         1 no    
+##  9         1 no    
+## 10         1 no    
+## # … with 494,690 more rows
+```
+
+---
+# Bootstrapping p-hat II
+
+
+```r
+pew %&gt;%
+  specify(response = closed, success = "yes") %&gt;%
+  generate(reps = 100, type = "bootstrap") %&gt;%
+* calculate(stat = "prop")
+```
+
+--
+
+
+```
+## # A tibble: 100 x 2
+##    replicate  stat
+##        &lt;int&gt; &lt;dbl&gt;
+##  1         1 0.643
+##  2         2 0.629
+##  3         3 0.635
+##  4         4 0.650
+##  5         5 0.642
+##  6         6 0.639
+##  7         7 0.634
+##  8         8 0.627
+##  9         9 0.628
+## 10        10 0.646
+## # … with 90 more rows
+```
+
+---
+# Bootstrapping p-hat III
+
+
+```r
+pew %&gt;%
+  specify(response = closed, success = "yes") %&gt;%
+  generate(reps = 100, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+* visualize()
+```
+
+--
+
+&lt;img src="CI-for-prop_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Bootstrapping p-hat III
+
+
+```r
+*boot_se &lt;- pew %&gt;%
+  specify(response = closed, success = "yes") %&gt;%
+  generate(reps = 100, type = "bootstrap") %&gt;%
+  calculate(stat = "prop") %&gt;%
+* summarize(se = sd(stat)) %&gt;%
+* pull()
+```
+
+--
+
+
+```r
+boot_se
+```
+
+```
+## [1] 0.006723887
+```
+
+
+---
+# Constructing a CI
+
+$$ \hat{p} \pm 1.96 \times SE $$
+
+--
+
+
+```r
+p_hat &lt;- pew %&gt;%
+  specify(response = closed, success = "yes") %&gt;%
+  calculate(stat = "prop") %&gt;%
+  pull()
+```
+
+--
+
+
+```r
+p_hat
+```
+
+```
+## [1] 0.6399838
+```
+
+--
+
+
+```r
+c(p_hat - 1.96 * boot_se, p_hat + 1.96 * boot_se)
+```
+
+```
+## [1] 0.6268050 0.6531626
+```
+
+---
+# Normal Approximation Method
+
+The sampling distribution of the point estimate `\(\hat{p}\)` can be approximated with:
+  
+`\(\hat{p} \sim N(\mu = p, \sigma = \sqrt{\frac{p(1-p)}{n}})\)` if
+
+--
+
+1. Observations are independent
+2. The number of observed successes and failures is more than 10.
+
+`$$n\hat{p} \ge 10 \\
+n(1 - \hat{p}) \ge 10$$`
+
+---
+# Question
+
+We are given that `\(n = 4947, \hat{p} = 0.64\)`. Which of the
+below is the correct calculation of the 95% confidence interval?
+
+1. `\(0.64 \pm 1.96 \sqrt{(.64 \times 0.36)/4947}\)`
+2. `\(0.64 \pm 1.65 \sqrt{(.64 \times 0.36)/4947}\)`
+3. `\(0.64 \pm 1.96 ((.64 \times 0.36)/\sqrt{4947})\)`
+4. `\(64 \pm 1.96 \sqrt{(64 \times 36)/4947}\)`
+
+
+---
+# Constructing a CI
+
+--
+
+
+```r
+nrow(pew) * p_hat
+```
+
+```
+## [1] 3166
+```
+
+```r
+nrow(pew) * (1 - p_hat)
+```
+
+```
+## [1] 1781
+```
+
+--
+
+
+```r
+approx_SE &lt;- sqrt((p_hat * (1 - p_hat)) / 
+                    nrow(pew))
+```
+
+--
+
+
+```r
+approx_SE
+```
+
+```
+## [1] 0.006824558
+```
+
+
+---
+# Constructing a CI, cont.
+
+
+```r
+z_star &lt;- qnorm(.025) # for a 95% CI
+```
+
+--
+
+
+```r
+z_star
+```
+
+```
+## [1] -1.959964
+```
+
+--
+
+
+```r
+MoE &lt;- z_star * approx_SE
+```
+
+--
+
+
+```r
+c(p_hat - MoE, p_hat + MoE)
+```
+
+```
+## [1] 0.6533597 0.6266079
+```
+
+
+---
+# Choosing between methods
+
+--
+
+### Bootstrap SE
+
+- Must have sufficiently large sample (n &gt; 30)
+- Can be calculated for any statistic
+
+--
+
+### Normal approximation
+
+- Must satisfy assumptions (independence, sample size)
+- Most commonly used (still)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
