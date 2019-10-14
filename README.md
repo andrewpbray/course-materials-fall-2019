@@ -108,13 +108,11 @@ Intro to R (due next Monday 11:59 pm)
 ## Week 5
 
 ### Monday
-
 - Statistical Inference: Is Yawning Contagious?
 - **For next time**
     - Read p. 61 - 81
 
 ### Wednesday
-
 - Hypothesis Testing via Randomization
     - Hypotheses
     - p-values
@@ -122,7 +120,6 @@ Intro to R (due next Monday 11:59 pm)
     - Start into problems for Lab 5.
 
 ### Thursday Lab
-
 - Lab 5 Benford's Law
 
 ### Friday
@@ -137,7 +134,6 @@ Intro to R (due next Monday 11:59 pm)
 ## Week 6
 
 ### Monday
-
 - Hypothesis Testing by other means, cont.
     - Exact probability
     - Normal Distribution
@@ -151,7 +147,6 @@ Intro to R (due next Monday 11:59 pm)
     - Read p. 102 - 107, 123 - 134
 
 ### Thursday Lab
-
 - *Office hours moved to Friday 2:30 - 3:30*
 - Lab 5 Inference for Categorial Data
 
@@ -161,3 +156,32 @@ Intro to R (due next Monday 11:59 pm)
 - Statistical Errors
 - **For next time**
     - Lab 6 due Monday 11:59 pm (along with problems)
+    
+    
+## Week 7
+
+### Monday
+- Statistical Power
+- Confidence Intervals for p
+    - via Bootstrap
+    - via Normal theory
+
+### Wednesday
+- Confidence intervals for two proportions
+- **For next time**
+    - Read p. 135 - 149
+
+### Thursday Lab
+- *Office hours moved to Friday 2:30 - 3:30*
+- No in-person lab this week
+
+### Friday
+- Quiz: Inference for categorical data
+- Chi-squared tests
+
+* * *
+
+## Fall Break
+
+* * *
+
