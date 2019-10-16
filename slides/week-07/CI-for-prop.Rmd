@@ -42,6 +42,10 @@ Boardwork
 ---
 # Pew Data
 
+How much uncertainty do we have in our estimate (64%) of the proportion of Republicans that think Democrats are more close-minded?
+
+--
+
 ```{r pew1, eval = FALSE}
 pew <- data.frame(party = "Republican",
                   closed = rep(c("yes", "no"),
@@ -161,6 +165,10 @@ c(p_hat - 1.96 * boot_se, p_hat + 1.96 * boot_se)
 ```
 
 ---
+# 
+
+
+---
 # Normal Approximation Method
 
 The sampling distribution of the point estimate $\hat{p}$ can be approximated with:
@@ -227,7 +235,7 @@ z_star
 --
 
 ```{r}
-MoE <- z_star * approx_SE
+(MoE <- z_star * approx_SE)
 ```
 
 --
@@ -254,3 +262,15 @@ c(p_hat - MoE, p_hat + MoE)
 - Must satisfy assumptions (independence, sample size)
 - Most commonly used (still)
 
+
+---
+
+```{r out.width=600, out.height = 300, echo = FALSE, fig.align='center'}
+knitr::include_graphics("figs/pew2.png")
+```
+
+Our estimate for the proportion of Republicans that view Democrats as more close-minded is 64% with a margin of error of 1.3%.
+
+--
+
+We're 95% confident that the true proportion of Republicans that view Democrats as more close-minded is between 62.6% and 65.3%.
