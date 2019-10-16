@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Confidence Intervals for Differences in Proportions</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Confidence Intervals for Differences in Proportions
+
+---
+
+
+
+
+
+---
+# Returning to Pew . . .
+
+--
+
+&lt;img src="figs/pew2.png" width="800" style="display: block; margin: auto;" /&gt;
+
+--
+
+Was there really an increase in the proportion of Democrats that view Republicans as lazy or is that just sampling variability?
+
+---
+# The Data
+
+--
+
+
+```r
+pew &lt;- data.frame(party = "Democrat",
+                  year = rep(c(2016, 2019), 
+                             c(4947, 4947)),
+                  lazy = c(rep(c("yes", "no"),
+                               c(890, 4057)),
+                           rep(c("yes", "no"),
+                               c(989, 3958))))
+```
+
+--
+
+
+```r
+slice(pew, 1:5)
+```
+
+```
+##      party year lazy
+## 1 Democrat 2016  yes
+## 2 Democrat 2016  yes
+## 3 Democrat 2016  yes
+## 4 Democrat 2016  yes
+## 5 Democrat 2016  yes
+```
+
+---
+# The Data
+
+
+```r
+pew &lt;- data.frame(party = "Democrat",
+                  year = rep(c(2016, 2019), 
+                             c(4947, 4947)),
+                  lazy = c(rep(c("yes", "no"),
+                               c(890, 4057)),
+                           rep(c("yes", "no"),
+                               c(989, 3958))))
+```
+
+
+```r
+*slice(pew, 4946:4950)
+```
+
+```
+##      party year lazy
+## 1 Democrat 2016   no
+## 2 Democrat 2016   no
+## 3 Democrat 2019  yes
+## 4 Democrat 2019  yes
+## 5 Democrat 2019  yes
+```
+
+
+---
+# Visualization
+
+--
+
+
+```r
+library(tidyverse)
+ggplot(pew, aes(x = year, fill = lazy)) +
+  geom_bar()
+```
+
+&lt;img src="CI-for-diff-in-props_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Point estimate
+
+--
+
+
+```r
+library(infer)
+(point_est &lt;- pew %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016)) %&gt;%
+  pull())
+```
+
+--
+
+
+```
+## Error: The explanatory variable of `year` is not appropriate
+## since 'diff in props` is expecting the explanatory variable to be a factor.
+```
+
+
+---
+# Point estimate
+
+
+```r
+library(infer)
+(point_est &lt;- pew %&gt;%
+* mutate(year = factor(year)) %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016)) %&gt;%
+  pull())
+```
+
+--
+
+
+```
+## [1] 0.02001213
+```
+
+--
+
+
+```r
+pew &lt;- mutate(pew, year = factor(year))
+```
+
+
+---
+# Bootstrapping the SE
+
+--
+
+
+```r
+(boot &lt;- pew %&gt;%
+  specify(response = lazy, 
+          explanatory = year, 
+          success = "yes") %&gt;%
+* generate(reps = 500,
+*          type = "bootstrap") %&gt;%
+  calculate(stat = "diff in props",
+            order = c(2019, 2016)))
+```
+
+--
+
+
+```
+## # A tibble: 500 x 2
+##    replicate    stat
+##        &lt;int&gt;   &lt;dbl&gt;
+##  1         1 0.0255 
+##  2         2 0.00809
+##  3         3 0.0135 
+##  4         4 0.0354 
+##  5         5 0.0112 
+##  6         6 0.0110 
+##  7         7 0.0112 
+##  8         8 0.0231 
+##  9         9 0.0124 
+## 10        10 0.0125 
+## # … with 490 more rows
+```
+
+
+---
+# The Bootstrap Distribution
+
+--
+
+
+```r
+boot %&gt;% 
+  visualize()
+```
+
+--
+
+&lt;img src="CI-for-diff-in-props_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# The Bootstrap SE
+
+
+```r
+(boot_se &lt;- boot %&gt;%
+  summarize(se = sd(stat)) %&gt;%
+  pull())
+```
+
+--
+
+
+```
+## [1] 0.007679403
+```
+
+--
+
+### Construct the CI
+
+
+```r
+c(point_est - 1.96 * boot_se,
+  point_est + 1.96 * boot_se)
+```
+
+```
+## [1] 0.004960499 0.035063759
+```
+
+
+---
+# Alternative: Normal Approximation
+
+--
+
+Conditions for the sampling distribution of `\(\hat{p}_1 - \hat{p}_2\)` to be normal:
+
+--
+
+- each proportion separately follows a normal model
+- the two samples are independent of one another
+
+--
+
+The standard error can be estimated with:
+
+$$ \widehat{SE} = \sqrt{\frac{\hat{p}_1 ( 1 - \hat{p}_1)}{n_1} + \frac{\hat{p}_2 ( 1 - \hat{p}_2)}{n_2}} $$
+
+
+
+---
+
+&lt;img src="figs/hw-exercise.png" width="800" style="display: block; margin: auto;" /&gt;
+
+--
+
+.tiny[
+
+```r
+hiv &lt;- data.frame(treatment = rep(c("Nevaripine", "Lopinavir"),
+                                  c(120, 120)),
+                  outcome = c(rep(c("worse", "not worse"),
+                                  c(26, 94)),
+                              rep(c("worse", "not worse"),
+                                  c(10, 110))))
+table(hiv)
+```
+
+```
+##             outcome
+## treatment    not worse worse
+##   Lopinavir        110    10
+##   Nevaripine        94    26
+```
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
