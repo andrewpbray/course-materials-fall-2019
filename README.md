@@ -185,3 +185,23 @@ Intro to R (due next Monday 11:59 pm)
 
 * * *
 
+
+## Week 8
+
+### Monday
+- Review: Chi-squared Test of Independence
+- Chi-squared Goodness of Fit
+- **For next time**
+    - Read p. 163-176, 195 - 199
+
+### Wednesday
+- Inference on a mean
+- **For next time**
+    - Read p. 177-194
+
+### Thursday Lab
+- Inference for Numerical Data
+
+### Friday
+- Inference on a difference in means
+- A Taxonomy of Inference
