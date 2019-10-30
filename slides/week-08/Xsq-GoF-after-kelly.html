@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>More with Chi-squared</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# More with Chi-squared
+
+---
+
+
+
+
+# Degrees of Freedom (physics)
+--
+
+*The number of independent ways by which a dynamic system can move, without violating any constraint imposed on it.* (wikipedia)
+
+&lt;img src="figs/dof.png" width="550" style="display: block; margin: auto;" /&gt;
+
+
+---
+#  Degrees of Freedom (statistics)
+--
+
+*The number of parameters that are free to vary, without violating any constraint imposed on it*.
+
+--
+
+## Parameters
+`\(p_{acu}, p_{sham}, p_{trad}\)`
+
+Since `\(\sum_{i = 1}^k p_i = 1\)`, one of our parameters is contrained, leaving `\(k-1\)` that are free to vary. Generally:
+
+--
+
+`$$df = (number\;of\;rows - 1) \times (number\;of\;columns - 1)$$`
+
+---
+# Shape of the `\(\chi^2\)`
+--
+
+&lt;img src="figs/chisq-shape.png" width="550" style="display: block; margin: auto;" /&gt;
+
+---
+# Confidence Intervals for `\(\chi^2\)`
+--
+
+These make no sense. Why not?
+--
+
+- We don't really care what the *true* `\(\chi^2\)` parameter value is.
+- A two-sided interval wouldn't make sense
+    - Distribution is bounded on the left by zero
+    - Only "extreme" values are in the right tail
+    
+---
+
+---
+# Chi-squared Goodness of Fit
+--
+
+## Ex: Diversity at Reed
+
+&lt;img src="figs/diversity-reed.png" width="550" style="display: block; margin: auto;" /&gt;
+
+In terms of ethnic diversity, how does the first year student body compare
+to the general population of Oregon?
+
+---
+
+&lt;img src="figs/reed-div-2019.png" width="700" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/oregon-ethnicity.png" width="700" style="display: block; margin: auto;" /&gt;
+
+
+---
+# The data
+
+Ethnicity | Asian | Black | Hispanic | White | Other | Total
+----------|-------|-------|----------|-------|-------|-------
+Reed count|  58   |   13  |   28     |  239  |  51   |  394
+Oregon %  |  .043 |  .02  |   .125   |  .77  | .042  |   1
+
+
+If the students at Reed were drawn from a population with these proportions,
+how many *counts* would we expect in each group?
+
+--
+
+`$$\textrm{exp. count} = n \times p_i$$`
+
+---
+# The data
+
+Ethnicity   | Asian | Black | Hispanic | White | Other | Total
+------------|-------|-------|----------|-------|-------|-------
+Obs. count |  58   |   13  |   28     |  239  |  51   |  394
+Exp. count | 16.94 |  7.88 | 49.25  | 303.38 | 16.548 | 394
+
+
+- Some sampling variability is expected, but how far from expected is too far?
+
+
+---
+# Simulating Oregonian Reedies
+
+.tiny[
+
+```r
+n &lt;- 354
+p &lt;- c(.043, .02, .125, .77, .042)
+samp &lt;- sample(c("asian", "black", "hispanic", "white", "other"), 
+               size = n, 
+               replace = TRUE, 
+               prob = p) %&gt;%
+  factor(levels = c("asian", "black", "hispanic", "white", "other"))
+table(samp)
+```
+
+```
+## samp
+##    asian    black hispanic    white    other 
+##       20        9       39      274       12
+```
+
+```r
+obs &lt;- c(58, 13, 28, 239, 51)
+```
+]
+
+---
+# Simulating Oregonian Reedies, again
+--
+
+.tiny[
+
+```r
+samp &lt;- sample(c("asian", "black", "hispanic", "white", "other"), 
+               size = n, 
+               replace = TRUE, 
+               prob = p) %&gt;%
+  factor(levels = c("asian", "black", "hispanic", "white", "other"))
+table(samp)
+```
+
+```
+## samp
+##    asian    black hispanic    white    other 
+##       20        4       34      284       12
+```
+
+```r
+obs &lt;- c(58, 13, 28, 239, 51)
+```
+]
+
+---
+# Simulating Oregonian Reedies, again again
+--
+
+.tiny[
+
+```r
+samp &lt;- sample(c("asian", "black", "hispanic", "white", "other"), 
+               size = n, 
+               replace = TRUE, 
+               prob = p) %&gt;%
+  factor(levels = c("asian", "black", "hispanic", "white", "other"))
+table(samp)
+```
+
+```
+## samp
+##    asian    black hispanic    white    other 
+##       16        7       40      271       20
+```
+
+```r
+obs &lt;- c(58, 13, 28, 239, 51)
+```
+]
+
+
+---
+# Simulating Oregonian Reedies
+
+
+
+.tiny[
+
+```r
+reed_demos %&gt;%
+  specify(response = ethnicity) %&gt;%
+  hypothesize(null = "point", p = c("asian"    = .043, 
+                                    "black"    = .02, 
+                                    "hispanic" = .125, 
+                                    "white"    = .77, 
+                                    "other"    = .042)) %&gt;%
+  generate(reps = 500, type = "simulate")
+```
+]
+
+--
+
+.tiny[
+
+```
+## Response: ethnicity (factor)
+## Null Hypothesis: point
+## # A tibble: 177,000 x 2
+## # Groups:   replicate [500]
+##    ethnicity replicate
+##    &lt;fct&gt;     &lt;fct&gt;    
+##  1 white     1        
+##  2 white     1        
+##  3 white     1        
+##  4 asian     1        
+##  5 white     1        
+##  6 white     1        
+##  7 white     1        
+##  8 black     1        
+##  9 white     1        
+## 10 white     1        
+## # … with 176,990 more rows
+```
+]
+
+---
+# Inference on many ps
+
+We *could* do a tests/CIs on `\(p_{reed} - p_{oregon}\)` for each group, however:
+
+- We have the whole population of Oregon.
+- Beware of multiple comparisons!
+
+--
+
+&lt;img src="figs/green-jelly-bean.png" width="200" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/significant.png" width="200" style="display: block; margin: auto;" /&gt;
+
+---
+# Creating a statistic
+
+For each of `\(k\)` categories:
+--
+
+1. Calculate the difference between observed and expected counts.
+--
+
+2. Scale each difference by an estimate of the SE ( `\(\sqrt(exp)\)` ).
+--
+
+3. Square the scaled difference to get rid of negatives.
+
+
+Then add them all up.
+
+`$$\chi^2 = \sum_{i = 1}^k \frac{(obs - exp)^2}{exp}$$`
+
+---
+# Reed Data
+
+Ethnicity   | Asian | Black | Hispanic | White | Other | Total
+------------|-------|-------|----------|-------|-------|-------
+Obs. count  |  49   |   10  |   34     |  206  |  55   |  354
+Exp. count | 15.22 |  7.08 | 44.25 | 272.58 | 14.87 | 354
+
+--
+
+`\begin{array}
+Z_{asian}^2 = (49 - 15.22)^2/15.22 = 74.97 \\
+Z_{black}^2 = (10 - 7.08)^2/7.08 = 1.20 \\
+Z_{hispanic}^2 = (34 - 51.5)^2/51.5 = 5.95 \\
+Z_{white}^2 = (206 - 272.58)^2/272.58 = 16.26 \\
+Z_{other}^2 = (55 - 14.87)^2/14.87 = 108.30
+\end{array}`
+
+--
+
+`\begin{array}
+Z_{asian}^2 + Z_{black}^2 + Z_{hispanic}^2 + Z_{white}^2 + Z_{other}^2 = 206.68 = \chi^2_{obs}
+\end{array}`
+
+---
+# Simulating `\(\chi^2\)` under `\(H_0\)`
+--
+
+.tiny[
+
+```r
+(null &lt;- reed_demos %&gt;%
+  specify(response = ethnicity) %&gt;%
+  hypothesize(null = "point", p = c("asian"    = .043, 
+                                    "black"    = .02, 
+                                    "hispanic" = .125, 
+                                    "white"    = .77, 
+                                    "other"    = .042)) %&gt;%
+  generate(reps = 500, type = "simulate") %&gt;%
+  calculate(stat = "Chisq"))
+```
+]
+
+--
+
+.tiny[
+
+```
+## # A tibble: 500 x 2
+##    replicate   stat
+##    &lt;fct&gt;      &lt;dbl&gt;
+##  1 1          0.395
+##  2 2          0.986
+##  3 3          5.90 
+##  4 4          1.16 
+##  5 5          0.676
+##  6 6          3.77 
+##  7 7          7.53 
+##  8 8          6.80 
+##  9 9          5.02 
+## 10 10        12.7  
+## # … with 490 more rows
+```
+]
+
+---
+# The null distribution
+--
+
+&lt;img src="Xsq-GoF-after-kelly_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+What is the probability of observing our data or more extreme ( `\(\chi^2 = 206.68\)`) under
+the null hypothesis that Reedies share the same ethnicity proportions as Oregon?
+
+--
+
+About zero.
+
+---
+# An alternate path to the null
+--
+
+If...
+
+--
+
+1. Independent observations
+--
+
+2. Each cell count has a count `\(\ge\)` 5
+--
+
+3. `\(k \ge 3\)`
+
+--
+
+then our statistic can be well-approximated by the `\(\chi^2\)` distribution with `\(k - 1\)` degrees of freedom.
+
+---
+# The null distribution
+--
+
+
+```
+## Warning: Check to make sure the conditions have been met for the
+## theoretical method. {infer} currently does not check these for you.
+```
+
+&lt;img src="Xsq-GoF-after-kelly_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+
+
+```r
+1 - pchisq(206.68, df = 4)
+```
+
+```
+## [1] 0
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
