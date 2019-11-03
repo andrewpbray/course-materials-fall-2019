@@ -123,6 +123,7 @@ Exp. count | 16.94 |  7.88 | 49.25  | 303.38 | 16.548 | 394
 
 ---
 # Simulating Oregonian Reedies
+--
 
 .tiny[
 ```{r sim}
@@ -134,6 +135,13 @@ samp <- sample(c("asian", "black", "hispanic", "white", "other"),
                prob = p) %>%
   factor(levels = c("asian", "black", "hispanic", "white", "other"))
 table(samp)
+```
+]
+
+--
+
+.tiny[
+```{r}
 obs <- c(58, 13, 28, 239, 51)
 ```
 ]

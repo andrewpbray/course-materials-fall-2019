@@ -1,0 +1,142 @@
+\documentclass[10pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{fancyhdr,url,hyperref}
+\usepackage{enumerate}
+
+\oddsidemargin 0in  %0.5in
+\topmargin     0in
+\leftmargin    0in
+\rightmargin   0in
+\textheight    9in
+\textwidth     6in %6in
+
+\pagestyle{fancy}
+
+\lhead{\textsc{MATH 141}}
+\chead{\textsc{Practice}}
+\lfoot{}
+\cfoot{}
+%\cfoot{\thepage}
+\rfoot{}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.0pt}
+
+\newcommand{\ans}{\vspace{0.25in}}
+\newcommand{\R}{{\sf R}\xspace}
+\newcommand{\cmd}[1]{\texttt{#1}}
+
+\title{MATH 141:\\Intro to Probability and Statistics}
+\date{}
+
+\rhead{\textsc{\today}}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\begin{enumerate}
+\item Let's say I survey the class and ask "Did you leave Reed College to travel during Fall Break". Out of 23 students, 14 of them or 60.8\% said yes. Is this consistent with a claim that half of Reed students travel over fall break? Assume the data set is called \texttt{fallbreak} and the column is \texttt{travel}, which takes values \texttt{yes} and \texttt{no}.
+
+\begin{enumerate}
+\item Please write the \texttt{infer} code that would test this claim.
+\vspace{80mm}
+\item Please write the \texttt{infer} code that compute a confidence interval for our statistic.
+\vspace{60mm}
+\end{enumerate}
+
+\item Consider the results from a randomized controlled trial conducted at Harvard regarding the effectiveness of three treatments (acupuncture, sham acupuncture, and traditional medicine (i.e. pain meds)) to reduce back backpain. The dataset is called \texttt{acu}.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+##          treatment
+## pain      acu sham trad
+##   noreduc 203  216  282
+##   reduc   184  171  106
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/unnamed-chunk-2-1} 
+
+}
+
+
+
+\end{knitrout}
+
+The scientists were interested in the question of whether these treatments had any effect on self-reported pain.
+
+\begin{enumerate}
+\item Write out the null hypothesis corresponding to this question.
+\vspace{20mm}
+\item Write out the \texttt{infer} code to generate the following plot.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-1} 
+
+}
+
+
+
+\end{knitrout}
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

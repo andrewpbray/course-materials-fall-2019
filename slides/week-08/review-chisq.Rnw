@@ -1,0 +1,89 @@
+\documentclass[10pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{fancyhdr,url,hyperref}
+\usepackage{enumerate}
+
+\oddsidemargin 0in  %0.5in
+\topmargin     0in
+\leftmargin    0in
+\rightmargin   0in
+\textheight    9in
+\textwidth     6in %6in
+
+\pagestyle{fancy}
+
+\lhead{\textsc{MATH 141}}
+\chead{\textsc{Practice}}
+\lfoot{}
+\cfoot{}
+%\cfoot{\thepage}
+\rfoot{}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.0pt}
+
+\newcommand{\ans}{\vspace{0.25in}}
+\newcommand{\R}{{\sf R}\xspace}
+\newcommand{\cmd}[1]{\texttt{#1}}
+
+\title{MATH 141:\\Intro to Probability and Statistics}
+\date{}
+
+\rhead{\textsc{\today}}
+
+\begin{document}
+
+\begin{enumerate}
+\item Let's say I survey the class and ask "Did you leave Reed College to travel during Fall Break". Out of 23 students, 14 of them or 60.8\% said yes. Is this consistent with a claim that half of Reed students travel over fall break? Assume the data set is called \texttt{fallbreak} and the column is \texttt{travel}, which takes values \texttt{yes} and \texttt{no}.
+
+\begin{enumerate}
+\item Please write the \texttt{infer} code that would test this claim.
+\vspace{80mm}
+\item Please write the \texttt{infer} code that compute a confidence interval for our statistic.
+\vspace{60mm}
+\end{enumerate}
+
+\item Consider the results from a randomized controlled trial conducted at Harvard regarding the effectiveness of three treatments (acupuncture, sham acupuncture, and traditional medicine (i.e. pain meds)) to reduce back backpain. The dataset is called \texttt{acu}.
+
+<<echo = FALSE>>=
+treatment <- rep(c("acu", "sham", "trad"), c(387, 387, 388))
+pain <- c(rep(c("reduc", "noreduc"), c(184, 203)),
+         rep(c("reduc", "noreduc"), c(171, 216)),
+         rep(c("reduc", "noreduc"), c(106, 282)))
+table(pain, treatment)
+@
+
+<<echo = FALSE, fig.height=2, fig.width=3, fig.align = "center">>=
+library(ggplot2)
+acu <- data.frame(pain, treatment)
+ggplot(acu, aes(x = treatment, fill = pain)) +
+ geom_bar(position = "fill")
+@
+
+The scientists were interested in the question of whether these treatments had any effect on self-reported pain.
+
+\begin{enumerate}
+\item Write out the null hypothesis corresponding to this question.
+\vspace{20mm}
+\item Write out the \texttt{infer} code to generate the following plot.
+
+<<fig.height = 3, message = FALSE, warning = FALSE, echo = FALSE, fig.align="center">>=
+library(infer)
+library(dplyr)
+obs_stat <- acu %>%
+  chisq_stat(pain ~ treatment)
+null <- acu %>%
+  specify(pain ~ treatment) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 500, type = "permute") %>%
+  calculate(stat = "Chisq")
+null %>%
+  visualise() +
+  shade_p_value(obs_stat = obs_stat, direction = "right")
+@
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

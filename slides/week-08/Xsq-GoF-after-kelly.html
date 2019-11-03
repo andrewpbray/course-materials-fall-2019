@@ -114,6 +114,7 @@ Exp. count | 16.94 |  7.88 | 49.25  | 303.38 | 16.548 | 394
 
 ---
 # Simulating Oregonian Reedies
+--
 
 .tiny[
 
@@ -133,6 +134,11 @@ table(samp)
 ##    asian    black hispanic    white    other 
 ##       20        9       39      274       12
 ```
+]
+
+--
+
+.tiny[
 
 ```r
 obs &lt;- c(58, 13, 28, 239, 51)
@@ -340,7 +346,7 @@ Z_{asian}^2 + Z_{black}^2 + Z_{hispanic}^2 + Z_{white}^2 + Z_{other}^2 = 206.68 
 # The null distribution
 --
 
-&lt;img src="Xsq-GoF-after-kelly_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="Xsq-GoF-after-kelly_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
 
 What is the probability of observing our data or more extreme ( `\(\chi^2 = 206.68\)`) under
 the null hypothesis that Reedies share the same ethnicity proportions as Oregon?
@@ -373,13 +379,7 @@ then our statistic can be well-approximated by the `\(\chi^2\)` distribution wit
 # The null distribution
 --
 
-
-```
-## Warning: Check to make sure the conditions have been met for the
-## theoretical method. {infer} currently does not check these for you.
-```
-
-&lt;img src="Xsq-GoF-after-kelly_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="Xsq-GoF-after-kelly_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -438,7 +438,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {
