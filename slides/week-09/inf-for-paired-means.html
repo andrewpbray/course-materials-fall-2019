@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Inference for Means II</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Inference for Means II
+
+---
+
+
+
+
+
+
+
+# IQ Example, two-sample
+--
+
+Consider a data set containing the IQs of 36 men and the IQs of 36 women. Let's use
+this data to test the following.
+
+`$$H_0: \mu_{M} - \mu_{F} = 0$$`
+
+`$$H_A: \mu_{M} - \mu_{F} \ne 0$$`
+
+
+
+--
+
+
+```
+##     IQ    sex
+## 72 122 female
+## 38 119 female
+## 46 115 female
+## 7  116   male
+## 14 117   male
+## 21 114   male
+```
+
+
+---
+class: small
+
+
+```r
+(ds &lt;- d %&gt;%
+  group_by(sex) %&gt;%
+  summarize(mean = mean(IQ),
+            s = sd(IQ),
+            n = n()))
+```
+
+```
+## # A tibble: 2 x 4
+##   sex     mean     s     n
+##   &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+## 1 female  116.  4.09    36
+## 2 male    115.  2.97    36
+```
+
+--
+
+&lt;img src="inf-for-paired-means_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Two sample t-test, step 1
+--
+
+## Calculate observed test statistic
+--
+
+
+```r
+x_bar_f &lt;- ds[1, 2] %&gt;% pull()
+x_bar_m &lt;- ds[2, 2] %&gt;% pull()
+s_f &lt;- ds[1, 3] %&gt;% pull()
+s_m &lt;- ds[2, 3] %&gt;% pull()
+n_f &lt;- ds[1, 4] %&gt;% pull()
+n_m &lt;- ds[2, 4] %&gt;% pull()
+```
+
+--
+
+
+```r
+t_obs &lt;- ((x_bar_m - x_bar_f) - 0)/
+  sqrt(s_m^2/n_m + s_f^2/n_f)
+t_obs
+```
+
+```
+## [1] -1.29
+```
+
+
+---
+# Two sample t-test, step 2
+--
+
+## Check conditions
+
+- Nearly normal populations (barplots looked OK)
+- Independent observations
+    - Within each group
+    - Between group means
+
+
+---
+# Two sample t-test, step 3
+--
+
+## Compute p-value
+
+
+```r
+df &lt;- min(n_f - 1, n_m - 1)
+pt(t_obs, df = df)
+```
+
+--
+
+
+```
+## [1] 0.104
+```
+
+--
+
+
+```r
+pt(t_obs, df = df) * 2
+```
+
+--
+
+
+```
+## [1] 0.207
+```
+
+Our data is consistent with the notion that men and women have the same mean IQ.
+
+
+---
+# Two-sample "t-test" via permutation
+--
+
+## Idea
+
+A slightly different way to lay out the null hypothesis is to say that both men's and women's IQs were drawn from the same distribution and thus the two variables, `IQ` and `sex`, are independent of one another.
+
+--
+
+With a null of `"independence"`, we can generate data using *permutation*.
+
+
+---
+# Two-sample "t-test" via permutation, cont.
+--
+
+
+```r
+d %&gt;%
+  specify(IQ ~ sex) %&gt;%
+  hypothesize(null = "independence") %&gt;%
+  generate(reps = 500, type = "permute") %&gt;%
+  calculate(stat = "diff in means",
+            order = c("male", "female"))
+```
+
+--
+
+
+```
+## # A tibble: 500 x 2
+##    replicate   stat
+##        &lt;int&gt;  &lt;dbl&gt;
+##  1         1  0.194
+##  2         2  0.417
+##  3         3 -0.139
+##  4         4  0.194
+##  5         5 -0.583
+##  6         6 -0.361
+##  7         7 -1.14 
+##  8         8  0.472
+##  9         9  0.361
+## 10        10  0.694
+## # … with 490 more rows
+```
+
+
+---
+
+
+```r
+null &lt;- d %&gt;%
+  specify(IQ ~ sex) %&gt;%
+  hypothesize(null = "independence") %&gt;%
+  generate(reps = 500, type = "permute") %&gt;%
+  calculate(stat = "diff in means",
+            order = c("male", "female"))
+```
+
+--
+
+
+```r
+obs_stat &lt;- d %&gt;%
+  specify(IQ ~ sex) %&gt;%
+  # hypothesize(null = "independence") %&gt;%
+  # generate(reps = 500, type = "permute") %&gt;%
+  calculate(stat = "diff in means",
+            order = c("male", "female")) %&gt;% 
+  pull()
+obs_stat
+```
+
+```
+## [1] -1.08
+```
+
+
+---
+# Visualizing the null
+--
+
+
+```r
+null %&gt;%
+  visualize() +
+  shade_p_value(obs_stat = obs_stat, 
+                direction = "both")
+```
+
+&lt;img src="inf-for-paired-means_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Computing a p-value
+--
+
+
+```r
+null %&gt;%
+  get_p_value(obs_stat = obs_stat, 
+              direction = "both")
+```
+
+```
+## # A tibble: 1 x 1
+##   p_value
+##     &lt;dbl&gt;
+## 1   0.232
+```
+
+Our data is consistent with the notion that men and women have the same mean IQ.
+
+
+---
+# Selecting a method
+--
+
+- Both methods lead to slightly different p-values but the same ultimate conclusion.
+--
+
+- Select based on which assumptions seem more reasonable.
+    - The `\(t\)`-distribution assumes normality of IQs within each group.
+    - The permutation method has a "stronger" null: that the whole distributions, not just the means, are the same.
+
+--
+
+But more important than both of these things: *be sure you understand the provenance of the data*.
+
+
+
+
+---
+# Original Data
+--
+
+Data were collected from schools in a large city on a set of thirty-six children
+who were identified as gifted children soon after they reached the age of four. 
+
+--
+
+
+```r
+head(gifted)
+```
+
+```
+##   score fatheriq motheriq speak count read edutv cartoons
+## 1   159      118      121    18    26  1.9  3.00     2.00
+## 2   164      117      119    20    37  2.5  1.75     3.25
+## 3   154      112      115    20    32  2.2  2.75     2.50
+## 4   157      112      115    12    24  1.7  2.75     2.25
+## 5   156      117      118    17    34  2.2  2.25     2.50
+## 6   150      114      114    13    28  1.9  1.25     3.75
+```
+
+
+---
+# Paired data
+--
+
+If there is a natural pairing between observations in two groups of size `\(n\)`, it 
+can make more sense to analyze them as a *single* sample of `\(n\)` differences.
+
+--
+
+
+```r
+gifted %&gt;%
+  mutate(diff = fatheriq - motheriq) %&gt;%
+  select(fatheriq, motheriq, diff)
+```
+
+```
+##    fatheriq motheriq diff
+## 1       118      121   -3
+## 2       117      119   -2
+## 3       112      115   -3
+## 4       112      115   -3
+## 5       117      118   -1
+## 6       114      114    0
+## 7       116      115    1
+## 8       111      113   -2
+## 9       110      110    0
+## 10      116      115    1
+## 11      118      119   -1
+## 12      118      120   -2
+## 13      116      115    1
+## 14      117      119   -2
+## 15      117      122   -5
+## 16      118      121   -3
+## 17      114      111    3
+## 18      114      119   -5
+## 19      110      106    4
+## 20      114      117   -3
+## 21      114      115   -1
+## 22      115      115    0
+## 23      110      110    0
+## 24      117      116    1
+## 25      114      117   -3
+## 26      114      114    0
+## 27      112      115   -3
+## 28      117      117    0
+## 29      116      114    2
+## 30      117      121   -4
+## 31      121      124   -3
+## 32      110      107    3
+## 33      114      118   -4
+## 34      113      114   -1
+## 35      114      115   -1
+## 36      122      122    0
+```
+
+
+---
+# Paired t-test
+--
+
+`$$H_0: \mu_{diff} = 0$$`
+
+`$$H_A: \mu_{diff} \ne 0$$`
+
+--
+## Check conditions
+
+1. Independent observations
+2. Nearly normal population
+
+&lt;img src="inf-for-paired-means_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: small
+
+# Paired t-test (cont.)
+--
+
+## Compute a test statistic
+
+
+```r
+(gs &lt;- gifted %&gt;%
+  mutate(diff = fatheriq - motheriq) %&gt;%
+  summarize(mean = mean(diff), s = sd(diff), n = n()))
+```
+
+--
+
+
+```
+##    mean    s  n
+## 1 -1.08 2.23 36
+```
+
+--
+
+
+```r
+(t_obs &lt;- (gs$mean - 0)/sqrt(gs$s^2/gs$n))
+```
+
+--
+
+
+```
+## [1] -2.91
+```
+
+- `\(df = n - 1\)`
+
+
+---
+# Paired compared
+--
+
+
+```r
+sqrt(gs$s^2/gs$n)
+```
+
+--
+
+
+```
+## [1] 0.372
+```
+
+--
+
+
+```r
+sqrt(s_m^2/n_m + s_f^2/n_f)
+```
+
+--
+
+
+```
+## [1] 0.843
+```
+
+--
+
+While the mean difference is the same in the paired and independent tests, if
+the data is paired, the dependency leads to a smaller SE.
+
+This principle is widely used in experiment design, e.g. pre- and post-test.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

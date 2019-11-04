@@ -1,0 +1,377 @@
+---
+title: "Inference for Means II"
+output:
+  xaringan::moon_reader:
+    css: ["fc", "fc-fonts", "reed.css", "default"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+options(digits=3)
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(infer)
+library(oilabs)
+library(openintro)
+```
+
+```{r echo = FALSE}
+set.seed(405)
+father_new <- rnorm(nrow(gifted), 
+                    mean = mean(gifted$fatheriq),
+                    sd = sd(gifted$fatheriq))
+mother_new <- father_new + rnorm(nrow(gifted), 1, 2)
+gifted$fatheriq <- round(father_new)
+gifted$motheriq <- round(mother_new)
+```
+
+
+# IQ Example, two-sample
+--
+
+Consider a data set containing the IQs of 36 men and the IQs of 36 women. Let's use
+this data to test the following.
+
+$$H_0: \mu_{M} - \mu_{F} = 0$$
+
+$$H_A: \mu_{M} - \mu_{F} \ne 0$$
+
+
+
+--
+
+```{r echo = FALSE}
+d <- data.frame(IQ = c(gifted$fatheriq, gifted$motheriq),
+                sex = rep(c("male", "female"), each = nrow(gifted)))
+set.seed(184)
+d <- d[sample(1:nrow(d)), ]
+head(d)
+```
+
+
+---
+class: small
+
+```{r}
+(ds <- d %>%
+  group_by(sex) %>%
+  summarize(mean = mean(IQ),
+            s = sd(IQ),
+            n = n()))
+```
+
+--
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4, fig.align = "center"}
+ggplot(d, aes(x = IQ)) +
+  geom_bar() +
+  facet_wrap(~sex) +
+  theme_bw()
+```
+
+
+---
+# Two sample t-test, step 1
+--
+
+## Calculate observed test statistic
+--
+
+```{r}
+x_bar_f <- ds[1, 2] %>% pull()
+x_bar_m <- ds[2, 2] %>% pull()
+s_f <- ds[1, 3] %>% pull()
+s_m <- ds[2, 3] %>% pull()
+n_f <- ds[1, 4] %>% pull()
+n_m <- ds[2, 4] %>% pull()
+```
+
+--
+
+```{r}
+t_obs <- ((x_bar_m - x_bar_f) - 0)/
+  sqrt(s_m^2/n_m + s_f^2/n_f)
+t_obs
+```
+
+
+---
+# Two sample t-test, step 2
+--
+
+## Check conditions
+
+- Nearly normal populations (barplots looked OK)
+- Independent observations
+    - Within each group
+    - Between group means
+
+
+---
+# Two sample t-test, step 3
+--
+
+## Compute p-value
+
+```{r pt, eval = FALSE}
+df <- min(n_f - 1, n_m - 1)
+pt(t_obs, df = df)
+```
+
+--
+
+```{r ref.label = "pt", echo = FALSE}
+df <- min(n_f - 1, n_m - 1)
+pt(t_obs, df = df)
+```
+
+--
+
+```{r pt2, eval = FALSE}
+pt(t_obs, df = df) * 2
+```
+
+--
+
+```{r ref.label = "pt2", echo = FALSE}
+pt(t_obs, df = df) * 2
+```
+
+Our data is consistent with the notion that men and women have the same mean IQ.
+
+
+---
+# Two-sample "t-test" via permutation
+--
+
+## Idea
+
+A slightly different way to lay out the null hypothesis is to say that both men's and women's IQs were drawn from the same distribution and thus the two variables, `IQ` and `sex`, are independent of one another.
+
+--
+
+With a null of `"independence"`, we can generate data using *permutation*.
+
+
+---
+# Two-sample "t-test" via permutation, cont.
+--
+
+```{r infer, eval = FALSE}
+d %>%
+  specify(IQ ~ sex) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 500, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("male", "female"))
+```
+
+--
+
+```{r ref.label = "infer", echo = FALSE}
+d %>%
+  specify(IQ ~ sex) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 500, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("male", "female"))
+```
+
+
+---
+
+```{r}
+null <- d %>%
+  specify(IQ ~ sex) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 500, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("male", "female"))
+```
+
+--
+
+```{r}
+obs_stat <- d %>%
+  specify(IQ ~ sex) %>%
+  # hypothesize(null = "independence") %>%
+  # generate(reps = 500, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("male", "female")) %>% 
+  pull()
+obs_stat
+```
+
+
+---
+# Visualizing the null
+--
+
+```{r, fig.align="center", fig.width = 8, fig.height = 5}
+null %>%
+  visualize() +
+  shade_p_value(obs_stat = obs_stat, 
+                direction = "both")
+```
+
+
+---
+# Computing a p-value
+--
+
+```{r}
+null %>%
+  get_p_value(obs_stat = obs_stat, 
+              direction = "both")
+```
+
+Our data is consistent with the notion that men and women have the same mean IQ.
+
+
+---
+# Selecting a method
+--
+
+- Both methods lead to slightly different p-values but the same ultimate conclusion.
+--
+
+- Select based on which assumptions seem more reasonable.
+    - The $t$-distribution assumes normality of IQs within each group.
+    - The permutation method has a "stronger" null: that the whole distributions, not just the means, are the same.
+
+--
+
+But more important than both of these things: *be sure you understand the provenance of the data*.
+
+
+
+
+---
+# Original Data
+--
+
+Data were collected from schools in a large city on a set of thirty-six children
+who were identified as gifted children soon after they reached the age of four. 
+
+--
+
+```{r}
+head(gifted)
+```
+
+
+---
+# Paired data
+--
+
+If there is a natural pairing between observations in two groups of size $n$, it 
+can make more sense to analyze them as a *single* sample of $n$ differences.
+
+--
+
+```{r}
+gifted %>%
+  mutate(diff = fatheriq - motheriq) %>%
+  select(fatheriq, motheriq, diff)
+```
+
+
+---
+# Paired t-test
+--
+
+$$H_0: \mu_{diff} = 0$$
+
+$$H_A: \mu_{diff} \ne 0$$
+
+--
+## Check conditions
+
+1. Independent observations
+2. Nearly normal population
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3, fig.align="center"}
+g <- gifted %>%
+  mutate(diff = fatheriq - motheriq)
+ggplot(g, aes(x = diff)) +
+  geom_density(fill = "tomato") +
+  theme_bw()
+```
+
+
+---
+class: small
+
+# Paired t-test (cont.)
+--
+
+## Compute a test statistic
+
+```{r gs, eval = FALSE}
+(gs <- gifted %>%
+  mutate(diff = fatheriq - motheriq) %>%
+  summarize(mean = mean(diff), s = sd(diff), n = n()))
+```
+
+--
+
+```{r ref.label = "gs", echo = FALSE}
+(gs <- gifted %>%
+  mutate(diff = fatheriq - motheriq) %>%
+  summarize(mean = mean(diff), s = sd(diff), n = n()))
+```
+
+--
+
+```{r gs2, eval = FALSE}
+(t_obs <- (gs$mean - 0)/sqrt(gs$s^2/gs$n))
+```
+
+--
+
+```{r ref.label = "gs2", echo = FALSE}
+(t_obs <- (gs$mean - 0)/sqrt(gs$s^2/gs$n))
+```
+
+- $df = n - 1$
+
+
+---
+# Paired compared
+--
+
+```{r se1, eval = FALSE}
+sqrt(gs$s^2/gs$n)
+```
+
+--
+
+```{r ref.label = "se1", echo = FALSE}
+sqrt(gs$s^2/gs$n)
+```
+
+--
+
+```{r se2, eval = FALSE}
+sqrt(s_m^2/n_m + s_f^2/n_f)
+```
+
+--
+
+```{r ref.label = "se2", echo = FALSE}
+sqrt(s_m^2/n_m + s_f^2/n_f)
+```
+
+--
+
+While the mean difference is the same in the paired and independent tests, if
+the data is paired, the dependency leads to a smaller SE.
+
+This principle is widely used in experiment design, e.g. pre- and post-test.
