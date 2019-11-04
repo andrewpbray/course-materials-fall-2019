@@ -154,7 +154,7 @@ null %>%
 ```
 
 5.  How many of these `null` permutations have a difference of at least
-    `obs_stat`? Shade those statistics in your null distribution plot
+    `obs_diff`? Shade those statistics in your null distribution plot
     and calculate the precise proportion (the p-value).
 
 -----
