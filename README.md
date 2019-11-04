@@ -200,8 +200,27 @@ Intro to R (due next Monday 11:59 pm)
     - Read p. 177-194
 
 ### Thursday Lab
-- Inference for Numerical Data
+- Inference for Numerical Data (Cancelled)
 
 ### Friday
-- Inference on a difference in means
-- A Taxonomy of Inference
+- The one sample t-test
+
+
+## Week 9
+
+### Monday
+- Inference for two means
+    - two sample t-test
+    - permutation test
+- Inference for many means
+    - ANOVA
+
+
+### Wednesday
+- Taxonomy of Inference
+
+### Thursday
+- Exam review
+
+### Friday
+- Exam
