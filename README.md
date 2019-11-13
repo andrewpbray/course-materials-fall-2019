@@ -212,8 +212,6 @@ Intro to R (due next Monday 11:59 pm)
 - Inference for two means
     - two sample t-test
     - permutation test
-- Inference for many means
-    - ANOVA
 
 
 ### Wednesday
@@ -224,3 +222,30 @@ Intro to R (due next Monday 11:59 pm)
 
 ### Friday
 - Exam
+
+
+## Week 10
+
+### Monday
+- Inference for many means
+    - ANOVA F-test
+- Review Midterm
+- **For next time**
+    - Read p. 219 - 227
+
+### Wednesday
+- Simple Linear Regression
+    - The linear model
+    - Residuals
+- **For next time**
+    - Read p. 227 - 238
+
+### Thursday
+- Lab: Simple Linear Regression
+
+### Friday
+- Simple Linear Regression II
+    - Estimating the line of best fit
+- **For next time**
+    - Read p. 238 - 244
+
