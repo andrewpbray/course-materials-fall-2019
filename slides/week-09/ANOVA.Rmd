@@ -115,7 +115,7 @@ knitr::include_graphics("figs/3-anovas.png")
 # Wolf River data
 --
 
-```{r wolf-boxes2, echo = FALSE, , fig.align="center", fig.height = 5}
+```{r wolf-boxes2, echo = FALSE, fig.align="center", fig.height = 5}
 ggplot(wolf, aes(x = Depth, y = HCB)) +
   geom_boxplot() +
   theme_bw(base_size = 18)
@@ -145,7 +145,7 @@ We can find the distribution of the F-statistic under the null hypothesis by
 --
 
 ```{r randoF2}
-wolf %>%
+null <- wolf %>%
   specify(response = HCB, explanatory = Depth) %>%
   hypothesize(null = "independence") %>%
   generate(reps = 1000, type = "permute") %>%
@@ -156,6 +156,24 @@ wolf %>%
 ---
 # Sampling dist for F via Randomization, cont.
 --
+
+```{r fig.align="center", fig.height = 5}
+null %>%
+  visualize() +
+  shade_p_value(obs_stat = f$F[1],
+                direction = "right")
+```
+
+
+---
+# Sampling dist for F via Randomization, cont.
+--
+
+```{r fig.align="center", fig.height = 5}
+null %>%
+  get_p_value(obs_stat = f$F[1], 
+              direction = "right")
+```
 
 
 ---
@@ -171,18 +189,17 @@ If:
 
 Then the sampling distribution for the $F$ statistic under the $H_0$ is well approximated by an F distribution with $df_1 = k - 1$ and $df_2 = N - k$. The p-value is represented by the upper tail.
 
-```{r f-output, echo = FALSE}
-f
+```{r f-output}
+1 - pf(f$F[1], df1 = 2, df2 = 30 - 3)
 ```
 
-
 ---
-# Sampling dist for F via Approximation, cont.
---
 
-```{r Fmethods, eval = FALSE}
-qplot(x = F_stats, geom = "density") +
-  stat_function(fun = df, args = c(df1 = 2, df2 = 27), col = "tomato")
+```{r fig.align="center", fig.height = 5, warning = FALSE}
+null %>%
+  visualize(method = "both") +
+  shade_p_value(obs_stat = f$F[1],
+                direction = "right")
 ```
 
 

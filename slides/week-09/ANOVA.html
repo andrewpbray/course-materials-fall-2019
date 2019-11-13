@@ -149,34 +149,46 @@ We can find the distribution of the F-statistic under the null hypothesis by
 
 
 ```r
-wolf %&gt;%
+null &lt;- wolf %&gt;%
   specify(response = HCB, explanatory = Depth) %&gt;%
   hypothesize(null = "independence") %&gt;%
   generate(reps = 1000, type = "permute") %&gt;%
   calculate(stat = "F")
 ```
 
+
+---
+# Sampling dist for F via Randomization, cont.
+--
+
+
+```r
+null %&gt;%
+  visualize() +
+  shade_p_value(obs_stat = f$F[1],
+                direction = "right")
 ```
-## # A tibble: 1,000 x 2
-##    replicate  stat
-##        &lt;int&gt; &lt;dbl&gt;
-##  1         1 0.228
-##  2         2 1.83 
-##  3         3 0.672
-##  4         4 0.237
-##  5         5 0.501
-##  6         6 1.67 
-##  7         7 1.53 
-##  8         8 1.03 
-##  9         9 0.228
-## 10        10 2.03 
-## # … with 990 more rows
-```
+
+&lt;img src="ANOVA_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
 # Sampling dist for F via Randomization, cont.
 --
+
+
+```r
+null %&gt;%
+  get_p_value(obs_stat = f$F[1], 
+              direction = "right")
+```
+
+```
+## # A tibble: 1 x 1
+##   p_value
+##     &lt;dbl&gt;
+## 1   0.057
+```
 
 
 ---
@@ -193,27 +205,25 @@ If:
 Then the sampling distribution for the `\(F\)` statistic under the `\(H_0\)` is well approximated by an F distribution with `\(df_1 = k - 1\)` and `\(df_2 = N - k\)`. The p-value is represented by the upper tail.
 
 
-```
-## Analysis of Variance Table
-## 
-## Response: HCB
-##           Df Sum Sq Mean Sq F value Pr(&gt;F)  
-## Depth      2   5.36   2.678    3.03  0.065 .
-## Residuals 27  23.85   0.883                 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```r
+1 - pf(f$F[1], df1 = 2, df2 = 30 - 3)
 ```
 
+```
+## [1] 0.0649
+```
 
 ---
-# Sampling dist for F via Approximation, cont.
---
 
 
 ```r
-qplot(x = F_stats, geom = "density") +
-  stat_function(fun = df, args = c(df1 = 2, df2 = 27), col = "tomato")
+null %&gt;%
+  visualize(method = "both") +
+  shade_p_value(obs_stat = f$F[1],
+                direction = "right")
 ```
+
+&lt;img src="ANOVA_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
