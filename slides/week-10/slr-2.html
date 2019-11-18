@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Simple Linear Regression II</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Simple Linear Regression II
+
+---
+
+
+
+
+
+&lt;img src="figs/id-the-slr.png" width="700" style="display: block; margin: auto;" /&gt;
+
+---
+# Estimating `\(\beta_1\)`
+--
+
+&lt;img src="slr-2_files/figure-html/find-b1-1.png" style="display: block; margin: auto;" /&gt;
+
+We use `\(s_x, s_y, \textrm{ and } R\)` to calculate `\(b_1\)`.
+
+---
+# Estimating `\(\beta_1\)`
+
+&lt;img src="slr-2_files/figure-html/find-b1-2-1.png" style="display: block; margin: auto;" /&gt;
+
+We use `\(s_x, s_y, \textrm{ and } R\)` to calculate `\(b_1\)`.
+
+---
+# Estimating `\(\beta_0\)`
+
+&lt;img src="slr-2_files/figure-html/find-b02-1.png" style="display: block; margin: auto;" /&gt;
+
+If the line of best fit *must* pass through `\((\bar{x}, \bar{y})\)`, what is `\(b_0\)`?
+
+---
+# Estimating `\(\beta_0\)`, cont.
+--
+
+Since `\((11.35, 86.01)\)` is on the line, the following relationship holds.
+
+$$ 86.01 = b_0 - 0.9 (11.35) $$
+--
+
+Then just solve for `\(b_0\)`.
+
+$$ b_0 = 86.01 + 0.9 (11.35) = 96.22$$
+--
+
+More generally:
+
+$$ b_0 = \bar{y} - b_1 \bar{x} $$
+
+---
+# Estimation in R
+--
+
+
+```r
+m1 &lt;- lm(Graduates ~ Poverty, data = poverty)
+summary(m1)
+```
+
+```
+## 
+## Call:
+## lm(formula = Graduates ~ Poverty, data = poverty)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -5.954 -1.820  0.544  1.515  6.199 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   96.202      1.343   71.65  &lt; 2e-16 ***
+## Poverty       -0.898      0.114   -7.86  3.1e-10 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.5 on 49 degrees of freedom
+## Multiple R-squared:  0.558,	Adjusted R-squared:  0.549 
+## F-statistic: 61.8 on 1 and 49 DF,  p-value: 3.11e-10
+```
+
+
+---
+# The `lm` object
+--
+
+
+```r
+attributes(m1)
+```
+
+```
+## $names
+##  [1] "coefficients"  "residuals"     "effects"       "rank"         
+##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
+##  [9] "xlevels"       "call"          "terms"         "model"        
+## 
+## $class
+## [1] "lm"
+```
+
+```r
+m1$coef
+```
+
+```
+## (Intercept)     Poverty 
+##      96.202      -0.898
+```
+
+```r
+m1$fit
+```
+
+```
+##    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15 
+## 83.1 88.7 84.3 80.0 84.7 87.8 89.2 88.9 81.1 85.3 85.3 86.7 85.6 86.1 88.4 
+##   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30 
+## 88.7 87.8 84.4 80.9 86.1 89.6 87.6 87.0 90.4 80.4 87.6 83.9 87.7 88.7 91.2 
+##   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45 
+## 89.2 80.2 83.6 84.4 85.5 87.1 83.0 86.1 87.9 87.0 84.1 87.0 83.5 82.5 87.9 
+##   46   47   48   49   50   51 
+## 87.3 88.4 86.5 81.8 88.5 87.7
+```
+
+
+---
+# Interpretation of `\(b_1\)`
+--
+
+The **slope** describes the estimated difference in the `\(y\)` variable if the explanatory
+variable `\(x\)` for a case happened to be one unit larger.
+
+--
+
+
+```r
+m1$coef[2]
+```
+
+```
+## Poverty 
+##  -0.898
+```
+
+*For each additional percentage point of people living below the poverty level,
+we expect a state to have a proportion of high school graduates that is 0.898
+lower*.
+
+**Be Cautious**: if it is observational data, you do not have evidence of a 
+*causal link*, but of an association, which still can be used for prediction.
+
+
+---
+# Interpretation of `\(b_0\)`
+--
+
+The **intercept** is the estimated `\(y\)` value that will be taken by a case with 
+an `\(x\)` value of zero.
+
+--
+
+
+```r
+m1$coef[1]
+```
+
+```
+## (Intercept) 
+##        96.2
+```
+
+While necessary for prediction, the intercept often has no meaningful interpretation.
+
+---
+boardwork
+
+---
+# Residual plot
+--
+
+
+
+
+```r
+m1 &lt;- lm(runs ~ at_bats, data = mlb11)
+ggplot(m1, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0,
+             linetype = "dashed") +
+  xlab("Fitted values") +
+  ylab("Residuals")
+```
+
+---
+# Residual plot
+
+&lt;img src="slr-2_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Distribution of the residuals
+--
+
+
+```r
+ggplot(m1, aes(x = .resid)) +
+  geom_histogram(binwidth = 25) +
+  xlab("Residuals")
+
+ggplot(m1, aes(sample = .resid)) +
+  geom_point(stat = "qq")
+```
+
+---
+# Distribution of the residuals
+--
+
+&lt;img src="slr-2_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# QQ plot
+--
+
+&lt;img src="slr-2_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
