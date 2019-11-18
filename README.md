@@ -249,3 +249,22 @@ Intro to R (due next Monday 11:59 pm)
 - **For next time**
     - Read p. 238 - 244
 
+
+## Week 11
+
+### Monday
+- Inference for Regression
+- **For next time**
+    - Quiz: SLR
+
+### Wednesday
+- Quiz: SLR
+- Outliers
+
+### Thursday
+- Lab: TBD
+
+### Friday
+- ANCOVA
+- **For next time**
+    - Read p. 261 - 266
