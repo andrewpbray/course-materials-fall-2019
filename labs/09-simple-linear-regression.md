@@ -1,4 +1,4 @@
-Lab 8: Simple Linear Regression
+Lab 9: Simple Linear Regression
 ================
 
 ## Batter up

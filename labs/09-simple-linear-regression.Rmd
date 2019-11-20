@@ -1,5 +1,5 @@
 ---
-title: "Lab 8: Simple Linear Regression"
+title: "Lab 9: Simple Linear Regression"
 output: github_document
 ---
 
