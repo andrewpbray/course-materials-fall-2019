@@ -1,0 +1,15 @@
+---
+title: "Lab 10: Simple Linear Regression II"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+***
+
+# Problem Set
+
+Please work through problems 24, 25, 30, 31, and 32 in the Exercises at the end of Chapter 5. Note that with the information provided, the inferential questions are most easily done using the mathematical approximation method.
