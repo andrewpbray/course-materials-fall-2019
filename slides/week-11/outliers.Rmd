@@ -1,38 +1,43 @@
 ---
 title: "Outliers"
 output:
-  ioslides_presentation:
-    incremental: true
+  xaringan::moon_reader:
+    css: ["fc", "fc-fonts", "reed.css", "default"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 options(digits=3)
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, fig.align='center')
 library(dplyr)
 library(ggplot2)
 library(oilabs)
 library(openintro)
 ```
 
+---
+# What is an outlier?
+--
 
-## What is an outlier? {.build}
+```{r out.width=320, echo = FALSE}
+knitr::include_graphics("figs/outliers_gladwell.jpg")
+```
 
-<div class="columns-2">
-![](http://marcoghislanzoni.com/blog/wp-content/uploads/2013/10/outliers_gladwell.jpg)
+--
 
 **Outlier** is a general term to describe a data point that doesn't follow the
-pattern set by the bulk of the data, when one takes into account the model.
-</div>
+pattern set by the bulk of the data when one takes into account the model.
 
 
-## Outlier Example One
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-# this chunk sets the chunk options for the whole document
-require(knitr)
-opts_chunk$set(warning=FALSE, message=FALSE)
-```
+---
+# Outlier Example One
+--
 
 ```{r, echo=FALSE}
 library(openintro)
@@ -52,7 +57,9 @@ lmPlot(x, y, col = COL[2], lCol = COL[1], lwd = 3)
 ```
 
 
-## Outlier Example Two
+---
+# Outlier Example Two
+--
 
 ```{r, echo=FALSE}
 i <- 2
@@ -65,7 +72,9 @@ lmPlot(x, y, col = COL[2], lCol = COL[1], lwd = 3)
 ```
 
 
-## Outlier Example Three
+---
+# Outlier Example Three
+--
 
 ```{r, echo=FALSE}
 i <- 3
@@ -78,7 +87,9 @@ lmPlot(x, y, col = COL[2], lCol = COL[1], lwd = 3)
 ```
 
 
-## Outlier Example Four
+---
+# Outlier Example Four
+--
 
 ```{r, echo=FALSE}
 i <- 5
@@ -91,7 +102,8 @@ lmPlot(x, y, col = COL[2], lCol = COL[1], lwd = 3)
 ```
 
 
-## Outlier Example Four
+---
+# Outlier Example Four
 
 ```{r, echo=FALSE}
 par(mar=c(4,4,1,1), las=1, mgp=c(2.5,0.5,0), cex.lab = 1.25, cex.axis = 1.25, mfrow = c(2,1))
@@ -99,23 +111,33 @@ lmPlot(x[1:70], y[1:70], col = COL[2], lCol = COL[1], lwd = 3, xlim = range(x), 
 ```
 
 
-## Outliers, leverage, influence {.build}
+---
+# Outliers, leverage, influence
+--
 
 **Outliers** are points that don't fit the trend in the rest of the data.
+
+--
+
 
 **High leverage points** have the potential to have an unusually large influence 
 on the fitted model.
 
+--
+
 **Influential points** are high leverage points that cause a very different
 line to be fit than would be with that point removed.
+--
 
 
-## Example of high lev, high influence
+---
+# Example of high lev, high influence
+--
 
 We have data on the surface temperature and light intensity of 47 stars in the
 star cluster CYG OB1, near Cygnus.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5.5, fig.width = 7}
 library(faraway)
 data(star)
 par(mar=c(4,4,2,1), las=1, mgp=c(2.5,0.7,0), cex.lab = 1.25, cex.axis = 1.25)
@@ -123,12 +145,13 @@ plot(light ~ temp, data = star, pch=19, col=COL[2], xlab = "log(temp)", ylab = "
 ```
 
 
-## Example of high lev, high influence
+---
+# Example of high lev, high influence
 
 We have data on the surface temperature and light intensity of 47 stars in the
 star cluster CYG OB1, near Cygnus.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5.5, fig.width = 7}
 par(mar=c(4,4,2,1), las=1, mgp=c(2.5,0.7,0), cex.lab = 1.25, cex.axis = 1.25)
 plot(light ~ temp, data = star, pch=19, col=COL[2], xlab = "log(temp)", ylab = "log(light intensity)")
 abline(lm(light~temp, data = star), col = "darkgreen", lwd = 3, lty = 2)
@@ -136,12 +159,13 @@ legend("top", inset = 0.05, "w/ outliers", lty = 2, lwd = 2, col = "darkgreen")
 ```
 
 
-## Example of high lev, high influence
+---
+# Example of high lev, high influence
 
 We have data on the surface temperature and light intensity of 47 stars in the
 star cluster CYG OB1, near Cygnus.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5.5, fig.width = 7}
 par(mar=c(4,4,2,1), las=1, mgp=c(2.5,0.7,0), cex.lab = 1.25, cex.axis = 1.25)
 plot(light ~ temp, data = star, pch=19, col=COL[2], xlab = "log(temp)", ylab = "log(light intensity)")
 abline(lm(light~temp, data = star), col = "darkgreen", lwd = 3, lty = 2)
@@ -150,9 +174,11 @@ legend("top", inset = 0.05, c("w/ outliers","w/o outliers"), lty = c(2,1), lwd =
 ```
 
 
-## Example of high lev, low influence
+---
+# Example of high lev, low influence
+--
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height = 5.5, fig.width = 7}
 set.seed(12)
 i <- 2
 x <- runif(n[i])
@@ -165,15 +191,19 @@ lmPlot(x, y, col = COL[2], lCol = COL[1], lwd = 3)
 ```
 
 
-## From leverage to influence
+---
+# From leverage to influence
+--
 
 **Leverage** measures the weight given to each point in determining the regression
 line.
 
+--
+
 **Influence** measures how different the regression line would be without a given
 point. Often measured with *Cook's Distance*.
 
-```{r, echo=FALSE, fig.height=4, }
+```{r, echo=FALSE, fig.height = 4.3, fig.width = 8.5}
 i <- 5
 x <- runif(n[i])
 y <- m[i]*x + rnorm(n[i])
@@ -189,10 +219,12 @@ abline(lm(y2 ~ x2), col = COL[1], lwd = 3)
 ```
 
 
-##
+---
+# Your Turn
+--
 
 In the following plots are there outliers, leverage pts, or influential pts?
 
-<center>
-<img src="../figs/outliers.png" height = 500>
-</center>
+```{r out.height=380, out.width=550, echo = FALSE}
+knitr::include_graphics("figs/outliers.png")
+```
