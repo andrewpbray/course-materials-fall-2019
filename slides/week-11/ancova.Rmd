@@ -1,25 +1,32 @@
 ---
 title: "SLR to MLR"
 output:
-  ioslides_presentation:
-    incremental: true
+  xaringan::moon_reader:
+    css: ["fc", "fc-fonts", "reed.css", "default"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 options(digits=3)
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align='center', fig.height = 6, fig.width = 8)
 library(dplyr)
 library(ggplot2)
 library(oilabs)
 library(openintro)
 ```
 
-## Example: shipping books {.build}
+# Example: shipping books
+--
 
-<center>
-<img src="../figs/pile-of-books.jpg" width = 500>
-</center>
+```{r out.width=480, echo = FALSE}
+knitr::include_graphics("figs/pile-of-books.jpg")
+```
 
 When you buy a book off of Amazon, you get a quote for how much it
 costs to ship. This is based on the weight of the book. If you
@@ -33,40 +40,60 @@ books <- allbacks[, c(3, 1, 4)]
 ```
 
 
-## Example: shipping books
-```{r plotallbacks}
-qplot(x = volume, y = weight, data = books)
+---
+# Shipping books visualized
+--
+
+```{r plotallbacks, echo = FALSE, fig.width=9, fig.height = 6.7}
+p1 <- ggplot(books, aes(x = volume, y = weight)) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18)
+p1
 ```
 
 
-## Example: shipping books {.smaller}
+---
+# Shipping books visualized, cont.
 
 ```{r fitm1, echo = FALSE}
 m1 <- lm(weight ~ volume, data = books)
 ```
 
-```{r plotallbackswline}
-qplot(x = volume, y = weight, data = books) + 
+```{r plotallbackswline, fig.width=9, fig.height = 6.7, echo = FALSE}
+p1 + 
   geom_abline(intercept = m1$coef[1], slope = m1$coef[2], col = "orchid")
 ```
 
 
-## Fitting the linear model {.build .smaller}
+---
+class: small
+# Fitting the linear model
+--
 
-```{r}
+```{r lm, eval = FALSE}
 m1 <- lm(weight ~ volume, data = books)
 summary(m1)
 ```
 
-### Q1: What is the equation for the line?
+--
+
+```{r ref.label = "lm", echo = FALSE}
+m1 <- lm(weight ~ volume, data = books)
+summary(m1)
+```
+
+
+---
+# Q1: What is the equation for the line?
+--
 
 $$ \hat{y} = 107.7 + 0.708 x $$
+
 $$ \widehat{weight} = 107.7 + 0.708 volume $$
 
-
-## {.build}
-
-Q2: Does this appear to be a reasonable setting to apply linear regression?
+---
+# Q2: Does this appear to be a reasonable setting to apply linear regression?
+--
 
 We need to check:
 
@@ -76,24 +103,33 @@ We need to check:
 4. Equal variance
 
 
-## Residual Plot
+---
+# Residual Plot
+--
 
-```{r resplot}
-qplot(x = .fitted, y = .stdresid, data = m1)
+```{r resplot, fig.width=9, fig.height = 6.7, echo = FALSE}
+ggplot(m1, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  xlab("Fitted values") +
+  ylab("Residuals")
 ```
 
 
-## QQ plot
+---
+# QQ plot
+--
 
-```{r resplot2, warning=FALSE}
-qplot(sample = .stdresid, data = m1, stat = "qq") +
-  geom_abline()
+```{r resplot2, warning=FALSE, fig.width=9, fig.height = 6.7, echo = FALSE}
+ggplot(m1, aes(sample = .resid)) +
+  geom_point(stat = "qq")
 ```
 
 
-## {.build .smaller}
-
-### Q3: Is volume a significant predictor?
+---
+class: small
+# Q3: Is volume a significant predictor?
+--
 
 ```{r sumtable}
 summary(m1)
@@ -102,10 +138,14 @@ summary(m1)
 Q4: How much of the variation in weight is explained by the model containing volume?
 
 
-## Multiple Regression {.build}
+---
+# Multiple Regression
+--
 
 Allows us create a model to explain one $numerical$ variable, the response, as a linear function of many explanatory variables that can be both $numerical$ and
 $categorical$.
+
+--
 
 We posit the true model:
 
@@ -115,8 +155,9 @@ We use the data to estimate our fitted model:
 
 $$ \hat{Y} = b_0 + b_1 X_1 + b_2 X_2 + \ldots + b_p X_p $$
 
-
-## Estimating $\beta_0, \beta_1$ etc.
+---
+# Estimating $\beta_0, \beta_1$ etc.
+--
 
 In least-squares regression, we're still finding the estimates that minimize
 the sum of squared residuals.
@@ -129,43 +170,56 @@ And yes, they have a closed-form solution.
 
 $$ \mathbf{b} = (X'X)^{-1}X'Y $$
 
+--
+
 In R:
 ```{r eval = FALSE}
 lm(Y ~ X1 + X2 + ... + Xp, data = mydata)
 ```
 
 
+---
+# Example: shipping books
+--
 
-## Example: shipping books {.build}
-
-```{r plotcolors}
-qplot(x = volume, y = weight, color = cover, data = books)
+```{r plotcolors, echo = FALSE}
+p2 <- ggplot(books, aes(x = volume, y = weight, color = cover)) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18)
+p2
 ```
 
 
-## Example: shipping books {.build .smaller}
+---
+# Example: shipping books
+--
 
 ```{r}
 m2 <- lm(weight ~ volume + cover, data = books)
 summary(m2)
 ```
 
-### How do we interpret these estimates?
+---
+## How do we interpret these estimates?
+
+boardwork
 
 
-#
-
-
-## Example: shipping books {.build .smaller}
+---
+# Example: shipping books
+--
 
 ```{r echo = FALSE}
-qplot(x = volume, y = weight, color = cover, data = books) +
+p3 <- p2 +
   geom_abline(intercept = m2$coef[1], slope = m2$coef[2], col = 2) +
   geom_abline(intercept = m2$coef[1] + m2$coef[3], slope = m2$coef[2], col = 4)
+p3
 ```
 
 
-## MLR slope interpretation {.build}
+---
+# MLR slope interpretation
+--
 
 The slope corresponding to the dummy variable tell us:
 
@@ -177,7 +231,10 @@ Each $b_i$ tells you how much you expect the $Y$ to change when you change the
 $X_i$, while **holding all other variables constant**.
 
 
-## {.smaller .build}
+---
+class:small
+# Your turn 1
+--
 
 ```{r}
 summary(m2)
@@ -188,7 +245,10 @@ summary(m2)
 volume and cover?
 
 
-##
+---
+class:small
+# Your turn 2
+--
 
 ```{r}
 summary(m2)$coef
@@ -202,32 +262,38 @@ Which of the follow represents the appropriate 95% CI for `coverpb`?
 3. $-184 \pm -4.55 \times 40.5$
 
 
-## Extending the model
+---
+# Extending the model
+--
 
 ```{r echo = FALSE}
-qplot(x = volume, y = weight, color = cover, data = books) +
-  geom_abline(intercept = m2$coef[1], slope = m2$coef[2], col = 2) +
-  geom_abline(intercept = m2$coef[1] + m2$coef[3], slope = m2$coef[2], col = 4)
+p3
 ```
 
 The two cover types have different intercepts. Do they share the same slope?
 
 
-#
+---
 
+boardwork
 
-## Extending the model
+---
+# Extending the model
 
 ```{r echo = FALSE}
-qplot(x = volume, y = weight, color = cover, data = books) +
+p2 +
   stat_smooth(method = "lm", se = FALSE)
 ```
 
 
-## {.smaller .build}
+---
+class:small
+# Interaction terms
+--
 
 ```{r}
-m3 <- lm(weight ~ volume + cover + volume:cover, data = books)
+m3 <- lm(weight ~ volume + cover + volume:cover, 
+         data = books)
 summary(m3)
 ```
 
@@ -235,7 +301,9 @@ Do we have evidence that two types of books have different relationships
 between volume and weight?
 
 
-## Take home messages {.build}
+---
+# Take home messages
+--
 
 - There is a statistically significant relationship between volume and weight.
 - There is a statistically significant difference in weight between paperback

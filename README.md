@@ -268,3 +268,14 @@ Intro to R (due next Monday 11:59 pm)
 - ANCOVA
 - **For next time**
     - Read p. 261 - 266
+
+
+## Week 12
+
+### Monday
+- Class cancelled
+
+### Wednesday
+- Geometry of Multiple Linear Regression
+
+*Thanksgiving Break*
