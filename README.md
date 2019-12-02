@@ -262,7 +262,7 @@ Intro to R (due next Monday 11:59 pm)
 - Outliers
 
 ### Thursday
-- Lab: TBD
+- Lab: Simple Linear Regression II
 
 ### Friday
 - ANCOVA
@@ -279,3 +279,34 @@ Intro to R (due next Monday 11:59 pm)
 - Geometry of Multiple Linear Regression
 
 *Thanksgiving Break*
+
+
+## Week 13
+
+### Monday
+- Model Selection
+- **For next time**
+    - Read p. 266 - 275
+
+### Wednesday
+- Multicollinearity
+
+### Thursday
+- Lab: Multiple Regression
+- **For next time**
+    - Read p. 275 - 284
+
+### Friday
+- Logistic Regression
+
+
+## Week 14
+
+### Monday
+- Bayes Estimation
+
+### Tuesday (in lab)
+- Final exam review
+
+### Wednesday
+- Poisson Regression
