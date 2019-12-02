@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>The Problem of Model Selection</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# The Problem of Model Selection
+
+---
+
+
+
+
+
+# The Problem of Model Selection
+
+.pull-left[
+&lt;img src="figs/needle_haystack.jpg" width="350" height="450" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+A given data set can conceivably have been generated from uncountably
+many models.  Identifying the true model is like finding a piece of hay in a 
+haystack. Said another way, the model space is massive and the criterion for
+what constitutes the "best" model is ill-defined.
+]
+
+
+---
+# The Problem of Model Selection
+--
+
+**Best strategy**: Use domain knowledge to constrain the model space and/or
+build models that help you answer specific scientific questions.
+
+--
+
+**Another common strategy:**
+
+1. Pick a criterion for "best".
+
+--
+
+2. Decide how to explore the model space.
+
+--
+
+3. Select "best" model in search area.
+
+--
+
+**Tread Carefully!!!**  The second strategy can lead to myopic analysis, 
+overconfidence, and wrong-headed conclusions.
+
+
+---
+# What do we mean by "best"?
+--
+
+While we'd like to find the "true" model, in practice we just hope we're doing
+a good job at:
+
+1. Prediction
+2. Description
+
+---
+# Synthetic example
+--
+
+How smooth should our model be?
+
+&lt;img src="model-selection_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Four candidates
+--
+
+
+```r
+m1 &lt;- lm(y ~ x)
+m2 &lt;- lm(y ~ x + I(x^2))
+m3 &lt;- lm(y ~ x + I(x^2) + I(x^3))
+m4 &lt;- lm(y ~ x + I(x^2) + I(x^3) + I(x^4))
+```
+
+We can add *polynomial* terms to account for non-linear trends.
+
+---
+# Four candidates
+--
+
+
+
+&lt;img src="model-selection_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# `\(R^2\)`
+--
+
+One way to quantify the explanatory power of a model.
+
+`$$R^2 = 1 - \frac{SS_{res}}{SS_{tot}}$$`
+
+This captures the proportion of variability in the `\(y\)` explained by our 
+regression model.
+
+---
+# Comparing `\(R^2\)`
+--
+
+
+```r
+c(summary(m1)$r.squared,
+  summary(m2)$r.squared,
+  summary(m3)$r.squared,
+  summary(m4)$r.squared)
+```
+
+```
+## [1] 0.439 0.919 0.992 0.994
+```
+
+The observed data is best explained by the quartic model.  So
+that's the best model, right?
+
+---
+# The BEST model!
+--
+
+&lt;img src="model-selection_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# The BEST model!
+--
+
+
+```r
+mBEST &lt;- lm(y ~ poly(x, 20))
+c(summary(m1)$r.squared,
+  summary(m2)$r.squared,
+  summary(m3)$r.squared,
+  summary(m4)$r.squared,
+  summary(mBEST)$r.squared)
+```
+
+```
+## [1] 0.439 0.919 0.992 0.994 0.997
+```
+
+But surely that's not the best model...
+
+---
+# Three Criteria
+--
+
+1. `\(R^2\)`
+2. `\(R^2_{adj}\)`
+3. p-values
+
+There are many others ( `\(AIC\)`, `\(BIC\)`, `\(AIC_C\)`, ...).
+
+---
+# `\(R^2_{adj}\)`
+--
+
+A measure of explanatory power of model:
+
+`$$R^2 = 1 - \frac{SS_{res}}{SS_{tot}}$$`
+
+--
+
+But it only goes up with added predictors, therefore we add a
+penalty.
+
+`$$R^2_{adj} = 1 - \frac{SS_{res}/(n - (p + 1))}{SS_{tot}/(n - 1)}$$`
+
+---
+# `\(R^2\)` vs. `\(R^2_{adj}\)`
+--
+
+
+```r
+summary(mBEST)$r.squared
+```
+
+```
+## [1] 0.997
+```
+
+```r
+summary(mBEST)$adj.r.squared
+```
+
+```
+## [1] 0.994
+```
+
+
+---
+# The Signal and the Noise
+--
+
+live coding
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
