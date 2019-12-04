@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Concepts in Practical Model Building</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Concepts in Practical Model Building
+
+---
+
+
+
+
+
+# Concepts in practical model building
+--
+
+- Recoding variables
+- Transformations
+- Multicollinearity
+
+---
+# LA Homes
+--
+
+&lt;img src="figs/david-mansion-LA.jpg" height="400" style="display: block; margin: auto;" /&gt;
+
+What factors help explain the price of a home in Los Angeles?
+
+
+---
+# Model building
+--
+
+We'd like to build a model to explain prices of homes in LA as a function of
+the characteristics of those homes.
+
+$$ \widehat{price} = location + size + pool + acreage \ldots $$
+
+--
+
+1. Statistical question
+2. Data wrangling
+3. Exploratory Data Analysis
+4. Modeling
+5. Interpretation
+
+Consider: *exploratory* vs. *confirmatory* analysis.
+
+
+---
+# Data wrangling  
+--
+
+Home price data is available on many websites now, including zillow.com.
+
+.tiny[
+
+```r
+LA &lt;- read.csv("../data/LA.csv")
+head(LA)
+```
+
+```
+##         city type bed bath garage sqft pool spa  price
+## 1 Long Beach        0    1         513       NA 119000
+## 2 Long Beach        0    1         550       NA 153000
+## 3 Long Beach        0    1         550       NA 205000
+## 4 Long Beach        0    1      1 1030       NA 300000
+## 5 Long Beach        0    1      1 1526       NA 375000
+## 6 Long Beach        1    1         552       NA 159900
+```
+]
+
+--
+
+**Unit of observation**: a home for sale in west LA.  
+**Population**: all homes in west LA.
+
+
+---
+class:small
+# Data wrangling, cont.
+--
+
+
+```r
+str(LA)
+```
+
+```
+## 'data.frame':	1594 obs. of  9 variables:
+##  $ city  : Factor w/ 4 levels "Beverly Hills",..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ type  : Factor w/ 3 levels "","Condo/Twh",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ bed   : int  0 0 0 0 0 1 1 1 1 1 ...
+##  $ bath  : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ garage: Factor w/ 5 levels "","1","2","3",..: 1 1 1 2 2 1 1 1 1 1 ...
+##  $ sqft  : int  513 550 550 1030 1526 552 558 596 744 750 ...
+##  $ pool  : Factor w/ 2 levels "","Y": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ spa   : logi  NA NA NA NA NA NA ...
+##  $ price : num  119000 153000 205000 300000 375000 ...
+```
+
+--
+
+
+```r
+levels(LA$city)
+```
+
+```
+## [1] "Beverly Hills" "Long Beach"    "Santa Monica"  "Westwood"
+```
+
+
+---
+class:small
+# Recoding `type`
+--
+
+The levels of a categorical variable can be queried using `levels()`.
+
+
+```r
+levels(LA$type)
+```
+
+```
+## [1] ""          "Condo/Twh" "SFR"
+```
+
+--
+
+
+```r
+LA &lt;- LA %&gt;%
+  mutate(type = fct_recode(type,
+                           "unknown" = "",
+                           "condo"   = "Condo/Twh",
+                           "sfr"     = "SFR"))
+levels(LA$type) &lt;- c("unknown", "condo", "sfr")
+```
+
+--
+
+
+```r
+levels(LA$type)
+```
+
+```
+## [1] "unknown" "condo"   "sfr"
+```
+
+---
+class:small
+# Recoding `garage`
+--
+
+
+```r
+str(LA)
+```
+
+```
+## 'data.frame':	1594 obs. of  9 variables:
+##  $ city  : Factor w/ 4 levels "Beverly Hills",..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ type  : Factor w/ 3 levels "unknown","condo",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ bed   : int  0 0 0 0 0 1 1 1 1 1 ...
+##  $ bath  : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ garage: Factor w/ 5 levels "","1","2","3",..: 1 1 1 2 2 1 1 1 1 1 ...
+##  $ sqft  : int  513 550 550 1030 1526 552 558 596 744 750 ...
+##  $ pool  : Factor w/ 2 levels "","Y": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ spa   : logi  NA NA NA NA NA NA ...
+##  $ price : num  119000 153000 205000 300000 375000 ...
+```
+
+What's going on with garage?
+
+
+---
+# Recoding `garage`, cont.
+--
+
+
+```r
+levels(LA$garage)
+```
+
+```
+## [1] ""   "1"  "2"  "3"  "4+"
+```
+
+--
+
+
+```r
+count(LA, garage)
+```
+
+```
+## # A tibble: 6 x 2
+##   garage     n
+##   &lt;fct&gt;  &lt;int&gt;
+## 1 ""       388
+## 2 1        260
+## 3 2        666
+## 4 3         37
+## 5 4+         6
+## 6 &lt;NA&gt;     237
+```
+
+
+---
+class:small
+# Recoding `garage`, cont.
+
+We can combine levels using a similar approach.
+
+--
+
+
+```r
+LA &lt;- LA %&gt;%
+  mutate(garage = fct_collapse(garage,
+                           "small" = c("", "1"),
+                           "large" = c("2", "3", "4+")))
+```
+
+--
+
+
+```r
+count(LA, garage)
+```
+
+```
+## # A tibble: 3 x 2
+##   garage     n
+##   &lt;fct&gt;  &lt;int&gt;
+## 1 small    648
+## 2 large    709
+## 3 &lt;NA&gt;     237
+```
+
+
+---
+class:small
+# Data wrangling, cont.
+--
+
+
+```r
+str(LA)
+```
+
+```
+## 'data.frame':	1594 obs. of  9 variables:
+##  $ city  : Factor w/ 4 levels "Beverly Hills",..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ type  : Factor w/ 3 levels "unknown","condo",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ bed   : int  0 0 0 0 0 1 1 1 1 1 ...
+##  $ bath  : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ garage: Factor w/ 2 levels "small","large": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sqft  : int  513 550 550 1030 1526 552 558 596 744 750 ...
+##  $ pool  : Factor w/ 2 levels "","Y": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ spa   : logi  NA NA NA NA NA NA ...
+##  $ price : num  119000 153000 205000 300000 375000 ...
+```
+
+What's going on with `pool` and `spa`?
+
+
+---
+class:small
+# Dropping columns
+--
+
+
+```r
+count(LA, pool)
+```
+
+```
+## # A tibble: 2 x 2
+##   pool      n
+##   &lt;fct&gt; &lt;int&gt;
+## 1 ""     1448
+## 2 Y       146
+```
+
+--
+
+
+```r
+LA %&gt;%
+  summarize(nas = sum(is.na(spa)))
+```
+
+```
+##    nas
+## 1 1594
+```
+
+--
+
+Two variables seem mis-coded/uninformative, so they should be dropped.
+
+
+```r
+LA &lt;- select(LA, -pool, -spa)
+```
+
+
+---
+# Fully wrangled data set
+--
+
+
+```r
+head(LA)
+```
+
+```
+##         city    type bed bath garage sqft  price
+## 1 Long Beach unknown   0    1  small  513 119000
+## 2 Long Beach unknown   0    1  small  550 153000
+## 3 Long Beach unknown   0    1  small  550 205000
+## 4 Long Beach unknown   0    1  small 1030 300000
+## 5 Long Beach unknown   0    1  small 1526 375000
+## 6 Long Beach unknown   1    1  small  552 159900
+```
+
+Once the data set is ready to go, save it to a new .csv file.
+
+
+```r
+write.csv(LA, file = "LA.csv")
+```
+
+
+---
+# Exploratory Data Analysis
+--
+
+Our goals are to:
+
+--
+
+1. Develop a sense of the *univariate* distributions in terms of center, shape, spread, unusual observations.
+
+--
+
+2. Develop a sense of the *bivariate* and *multivariate* distributions and what
+they indicate about the relationship between variables.
+
+
+---
+# Question  
+--
+
+Which of the following are *not* good methods to visualize the distribution
+of a single variable?
+
+1. mosaic plot
+2. density plot
+3. scatterplot
+4. histogram
+5. side-by-side boxplots
+
+
+---
+# Question
+
+Which of the following at *not* good methods to visualize the distribution
+of a single variable?
+
+1. **mosaic plot**
+2. density plot
+3. **scatterplot**
+4. histogram
+5. **side-by-side boxplots**
+
+
+---
+# EDA for `price`  
+--
+
+&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Question
+--
+
+How would you visualize the relationship between `price` and `city`?
+
+
+```r
+head(LA)
+```
+
+```
+##         city    type bed bath garage sqft  price
+## 1 Long Beach unknown   0    1  small  513 119000
+## 2 Long Beach unknown   0    1  small  550 153000
+## 3 Long Beach unknown   0    1  small  550 205000
+## 4 Long Beach unknown   0    1  small 1030 300000
+## 5 Long Beach unknown   0    1  small 1526 375000
+## 6 Long Beach unknown   1    1  small  552 159900
+```
+
+
+---
+# Question
+
+How would you visualize the relationship between `price` and `city`?
+
+&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Question
+--
+
+How would you visualize the relationship between `price` and `sqft`?
+
+
+```r
+head(LA)
+```
+
+```
+##         city    type bed bath garage sqft  price
+## 1 Long Beach unknown   0    1  small  513 119000
+## 2 Long Beach unknown   0    1  small  550 153000
+## 3 Long Beach unknown   0    1  small  550 205000
+## 4 Long Beach unknown   0    1  small 1030 300000
+## 5 Long Beach unknown   0    1  small 1526 375000
+## 6 Long Beach unknown   1    1  small  552 159900
+```
+
+
+---
+# Question
+
+&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Transformations  
+--
+
+Highly skewed data (particularly the response) can be very difficult to model using least squares regression. A common solution is to consider a transformation of the variable.
+
+$$ \widehat{price} \sim sqft $$
+
+versus
+
+$$\widehat{log(price)} \sim log(sqft) $$
+
+
+---
+# EDA for `price`  
+--
+
+.tiny[
+
+```r
+LA &lt;- LA %&gt;%
+  mutate(logprice = log(price))
+```
+]
+
+--
+
+&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# EDA for `logprice` and `logsqft`
+--
+
+
+
+&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class:small
+# Comparing residuals
+--
+
+
+```r
+m1 &lt;- lm(price ~ sqft, data = LA)
+m2 &lt;- lm(logprice ~ logsqft, data = LA)
+```
+
+--
+
+&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Transformation, cont.
+--
+
+Highly skewed data often leads to invalid models. This can be often be fixed 
+with a transformation, but the interpretations change slightly.
+
+--
+
+
+```
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)     2.70     0.1437    18.8 1.97e-71
+## logsqft         1.44     0.0195    73.8 0.00e+00
+```
+
+*A one unit increase in the log sqft of a home is associated with a 1.44 unit
+increase in the log price of a home.*
+
+
+---
+# Modeling: a simple model for price  
+--
+
+$$ \widehat{log(price)} \sim bed $$
+
+
+```r
+m3 &lt;- lm(logprice ~ bed, data = LA)
+```
+
+--
+
+What do you expect the *sign* of the slope for `bed` to be?
+
+--
+
+
+```r
+summary(m3)$coef
+```
+
+```
+##             Estimate Std. Error t value  Pr(&gt;|t|)
+## (Intercept)   11.802     0.0436   270.6  0.00e+00
+## bed            0.532     0.0142    37.3 9.77e-220
+```
+
+
+---
+# A less simple model for price  
+--
+
+$$ \widehat{log(price)} \sim bed + log(sqft) $$
+
+
+```r
+m4 &lt;- lm(log(price) ~ bed + logsqft, data = LA)
+```
+
+--
+
+What do you expect the *sign* of the slope for `bed` and `logsqft` to be?
+
+--
+
+
+```r
+summary(m4)$coef
+```
+
+```
+##             Estimate Std. Error t value  Pr(&gt;|t|)
+## (Intercept)    1.467     0.2178    6.73  2.28e-11
+## bed           -0.123     0.0164   -7.46  1.46e-13
+## logsqft        1.656     0.0346   47.85 2.60e-310
+```
+
+
+---
+# Multicollinearity
+--
+
+Correlation between the predictors has some important consequences:
+
+1. Addition or removal of correlated predictors can lead to slope sign changes.
+2. Correlation between the predictors leads to an inflated `\(SE(b_1)\)`.
+
+In sum: multicollinearity leads to **instability** in your estimates.
+
+---
+# The SE of the slope  
+--
+
+In the case of a MLR model with two correlated predictors,
+
+$$ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \epsilon $$
+
+If `\(r_{1,2}\)` is the correlation between `\(X_1\)` and `\(X_2\)`, then.
+
+`$$SE(b_i) \propto \frac{\sigma}{1 - r_{1,2}}$$`
+
+
+---
+# Multicollinearity
+--
+
+**Take-home lesson**: if your predictors are correlated, then they're carrying
+the same information about the response and your model with have a difficult
+time attributing explanatory power to this variable or that.
+
+--
+
+One approach: remove one/some of the correlated predictors.
+
+--
+
+Another approach: be ok with the flipping signs. Think of each model as an answer to a specific question.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
