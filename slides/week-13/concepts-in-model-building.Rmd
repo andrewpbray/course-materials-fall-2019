@@ -487,6 +487,13 @@ summary(m4)$coef
 
 
 ---
+# Simpson's Paradox
+--
+
+Boardwork
+
+
+---
 # Multicollinearity
 --
 
@@ -524,4 +531,4 @@ One approach: remove one/some of the correlated predictors.
 
 --
 
-Another approach: be ok with the flipping signs. Think of each model as an answer to a specific question.
+Another approach: get more data to lower the $SE$.

@@ -393,7 +393,7 @@ of a single variable?
 # EDA for `price`  
 --
 
-&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -423,7 +423,7 @@ head(LA)
 
 How would you visualize the relationship between `price` and `city`?
 
-&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -451,7 +451,7 @@ head(LA)
 ---
 # Question
 
-&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -481,7 +481,7 @@ LA &lt;- LA %&gt;%
 
 --
 
-&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -490,7 +490,7 @@ LA &lt;- LA %&gt;%
 
 
 
-&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -506,7 +506,7 @@ m2 &lt;- lm(logprice ~ logsqft, data = LA)
 
 --
 
-&lt;img src="multicollinearity_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="concepts-in-model-building_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -586,6 +586,13 @@ summary(m4)$coef
 ## bed           -0.123     0.0164   -7.46  1.46e-13
 ## logsqft        1.656     0.0346   47.85 2.60e-310
 ```
+
+
+---
+# Simpson's Paradox
+--
+
+Boardwork
 
 
 ---
