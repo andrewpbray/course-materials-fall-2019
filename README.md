@@ -292,7 +292,7 @@ Intro to R (due next Monday 11:59 pm)
 - Multicollinearity
 
 ### Thursday
-- Lab: Multiple Regression
+- Lab: Multiple Regression (Due *Wednesday* end of day)
 - **For next time**
     - Read p. 275 - 284
 
