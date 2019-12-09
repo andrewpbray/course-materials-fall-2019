@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Bayesian Estimation</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Bayesian Estimation
+
+---
+
+
+
+
+Please draw your own subjective distributions for the following events/items.
+
+1. The probability that it will snow at Reed this winter.
+2. The probability that, on a given night, the sun has gone supernova.
+3. The total number of individual socks that you own.
+
+
+---
+# Karl Broman's Socks
+--
+
+
+
+
+&lt;img src="figs/broman-tweet.png" width="370" style="display: block; margin: auto;" /&gt;
+
+
+---
+class:small
+# Classical H test 
+--
+
+## Assert a model
+`\(H_0\)`: I have `\(N_{pairs}\)` pairs of socks and `\(N_{singles}\)` singletons. The first 11 socks that I pull out of the machine are a random sample from this population.
+
+--
+
+## Decide on a test statistic
+The number of singletons in the sample: 11.
+
+--
+
+## Construct the sampling distribution
+Probability theory or simulation.
+
+--
+
+## See where your observed stat lies in that distribution
+Find the p-value if you like.
+
+
+---
+# `\(H_0\)`
+--
+
+&lt;img src="figs/pairs-socks.png" width="220" style="display: block; margin: auto;" /&gt;
+
+`$$N_{pairs} = 9$$`
+
+
+---
+# `\(H_0\)`
+
+&lt;img src="figs/all-socks.png" width="400" style="display: block; margin: auto;" /&gt;
+
+`$$N_{pairs} = 9; \quad N_{singles} = 5$$`
+
+
+---
+# Contructing the sampling dist. 
+--
+
+We'll use simulation.
+
+--
+
+Create the population of socks:
+
+
+
+```r
+sock_pairs &lt;- c("A", "B", "C", "D", "E", 
+                "F", "G", "H", "I", "J", "K")
+sock_singles &lt;- c("l", "m", "n", "o", "p")
+socks &lt;- c(rep(sock_pairs, 
+               each = 2), 
+           sock_singles)
+```
+
+--
+
+
+```r
+socks
+```
+
+```
+##  [1] "A" "A" "B" "B" "C" "C" "D" "D" "E" "E" "F" "F" "G" "G" "H" "H" "I"
+## [18] "I" "J" "J" "K" "K" "l" "m" "n" "o" "p"
+```
+
+
+---
+# One draw from the machine 
+--
+
+.tiny[
+
+```r
+picked_socks &lt;- sample(socks, size = 11, replace = FALSE)
+picked_socks
+```
+
+```
+##  [1] "F" "J" "l" "J" "E" "m" "H" "A" "p" "n" "I"
+```
+]
+
+--
+
+.tiny[
+
+```r
+sock_counts &lt;- table(picked_socks)
+sock_counts
+```
+
+```
+## picked_socks
+## A E F H I J l m n p 
+## 1 1 1 1 1 2 1 1 1 1
+```
+]
+
+--
+
+.tiny[
+
+```r
+n_singles &lt;- sum(sock_counts == 1)
+n_singles
+```
+
+```
+## [1] 9
+```
+]
+
+
+---
+# Our simulator
+--
+
+&lt;img src="figs/washing-machine.png" width="310" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Constructing the sampling dist. 
+--
+
+
+
+
+```r
+pick_socks(N_pairs = 9,N_singles = 5,
+           N_pick = 11)
+```
+
+```
+## [1] 11
+```
+
+--
+
+
+```r
+pick_socks(9, 5, 11)
+```
+
+```
+## [1] 7
+```
+
+--
+
+
+```r
+pick_socks(9, 5, 11)
+```
+
+```
+## [1] 7
+```
+
+Repeat many, many times...
+
+
+---
+# The sampling distribution
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# The sampling distribution
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# The p-value 
+--
+
+Quantifying how far into the tails our observed count was.
+
+
+```r
+table(sim_singles)
+```
+
+```
+## sim_singles
+##   1   3   5   7   9  11 
+##   3  36 239 435 244  43
+```
+
+--
+
+
+```r
+table(sim_singles)[6]/1000
+```
+
+```
+##    11 
+## 0.043
+```
+
+--
+
+
+
+Our two-tailed p-value is 0.086.
+
+
+---
+# Question
+--
+
+What is the best definition for our one-tailed p-value in probability notation?
+
+1. P( `\(H_0\)` is true | data) = 0.043
+2. P( `\(H_0\)` is false | data) = 0.043
+3. P( `\(H_0\)` is true) = 0.043
+4. P( data | `\(H_0\)` is true) = 0.043
+5. P( data) = 0.043
+
+
+---
+# Question
+
+What is the best definition for our one-tailed p-value in probability notation?
+
+1. P( `\(H_0\)` is true | data) = 0.043
+2. P( `\(H_0\)` is false | data) = 0.043
+3. P( `\(H_0\)` is true) = 0.043
+4. **P( data | `\(H_0\)` is true) = 0.043**
+5. P( data) = 0.043
+
+
+---
+# The challenge with the classical method
+--
+
+The result of a hypothesis test is a probability of the form:
+
+$$ P(\textrm{ data or more extreme } | \ H_0 \textrm{ true }) $$
+
+while most people *think* they're getting
+
+$$ P(\ H_0 \textrm{ true } | \textrm{ data }) $$
+
+How can we go from the former to the latter?
+
+
+---
+# What we have
+--
+
+&lt;img src="figs/classical-socks.png" width="800" style="display: block; margin: auto;" /&gt;
+
+
+---
+# What we want
+--
+
+&lt;img src="figs/bayes-socks.png" width="800" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Bayesian modeling via Bayes' rule 
+--
+
+$$P(A \ | \ B) = \frac{P(A \textrm{ and } B)}{P(B)} $$
+
+$$P(A \ | \ B) = \frac{P(B \ | \ A) \ P(A)}{P(B)} $$
+
+$$P(model \ | \ data) = \frac{P(data \ | \ model) \ P(model)}{P(data)} $$
+
+What does it mean to think about `\(P(model)\)`?
+
+
+---
+
+Please draw your own subjective distributions for the following events/items.
+
+1. The probability that it will snow at Reed this winter.
+2. The probability that, on a given night, the sun has gone supernova.
+3. The total number of individual socks that you own.
+
+
+---
+# Prior distribution
+--
+
+A *prior distribution* is a probability distribution for a *parameter* that 
+summarizes the information that you have before seeing the data. Prior on `\(N\)`:
+
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Prior on proportion pairs
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Our scheme
+--
+
+&lt;img src="figs/abc1.png" width="550" style="display: block; margin: auto;" /&gt;
+
+
+---
+# One simulation
+--
+
+&lt;img src="figs/abc2.png" width="620" style="display: block; margin: auto;" /&gt;
+
+---
+# A second simulation
+
+&lt;img src="figs/abc3.png" width="620" style="display: block; margin: auto;" /&gt;
+
+---
+# A third simulation
+
+&lt;img src="figs/abc4.png" width="620" style="display: block; margin: auto;" /&gt;
+
+---
+# A fourth simulation
+
+&lt;img src="figs/abc5.png" width="620" style="display: block; margin: auto;" /&gt;
+
+---
+# The actual data
+
+&lt;img src="figs/abc6.png" width="620" style="display: block; margin: auto;" /&gt;
+
+---
+# The actual data
+
+&lt;img src="figs/abc7.png" width="620" style="display: block; margin: auto;" /&gt;
+
+---
+class:small
+# Full simulation 
+--
+
+
+
+
+```r
+head(sock_sim)
+```
+
+```
+##   singletons pairs n_socks prop_pairs
+## 1          5     3      18      0.826
+## 2         11     0      53      0.715
+## 3          9     1      27      0.973
+## 4          7     2      35      0.724
+## 5          9     1      31      0.869
+## 6          9     1      33      0.758
+```
+
+--
+
+
+```r
+sock_sim %&gt;%
+  filter(singletons == 11, pairs == 0) %&gt;%
+  head()
+```
+
+--
+
+
+```
+##   singletons pairs n_socks prop_pairs
+## 1         11     0      53      0.715
+## 2         11     0      41      0.885
+## 3         11     0      53      0.957
+## 4         11     0      37      0.773
+## 5         11     0      45      0.880
+## 6         11     0      51      0.754
+```
+
+
+
+---
+# Proportion of pairs
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Number of socks
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Karl Broman's Socks
+--
+
+&lt;img src="figs/broman-tweet.png" width="370" style="display: block; margin: auto;" /&gt;
+
+
+---
+# The posterior distribution 
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Distribution of a parameter after conditioning on the data
+- Synthesis of prior knowledge and observations (data)
+
+--
+
+## Question
+What is your best guess for the number of socks that Karl has?
+
+
+---
+# Our best guess
+--
+
+&lt;img src="bayesian-estimation_files/figure-html/unnamed-chunk-38-1.png" style="display: block; margin: auto;" /&gt;
+
+- The posterior median is 44 socks.
+
+
+---
+# Karl Broman's Socks
+--
+
+&lt;img src="figs/broman-tweet2.png" width="600" style="display: block; margin: auto;" /&gt;
+
+--
+
+$$ 21 \times 2 + 3 = 45 \textrm{ socks} $$
+
+
+---
+# Summary
+--
+
+Bayesian methods . . .
+
+--
+
+- Require the subjective specification of your prior knowledge
+
+--
+
+- Provide a posterior distribution on the parameters
+
+--
+
+- Have strong intuition
+
+--
+
+- Are usually computationally intensive
+
+
+---
+
+&lt;img src="figs/supernova.png" width="360" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
