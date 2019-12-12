@@ -1,0 +1,396 @@
+---
+title: "Modeling Senior Theses"
+output:
+  xaringan::moon_reader:
+    css: ["fc", "fc-fonts", "reed.css", "default"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-forest-light
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center")
+library(tidyverse)
+library(infer)
+```
+
+# Case study: senior theses
+
+```{r echo = TRUE}
+theses <- read.csv("../data/sample_theses.csv")
+str(theses)
+```
+
+
+---
+class:small
+**Question 1**: What is the average number of times a thesis is checked out? (Description)
+
+--
+
+```{r, fig.height=3, fig.width=5, fig.align='center'}
+ggplot(theses, aes(x = checkouts)) +
+  geom_bar() +
+  theme_bw(base_size = 18) 
+```
+
+--
+
+```{r}
+theses %>%
+  summarize(mean(checkouts),
+            median(checkouts))
+```
+
+
+---
+class:small
+**Question 1**: What is the average number of times a thesis is checked out? (Inference) 
+
+--
+
+**Confidence interval on one mean (approximation method)**
+
+$$
+\bar{x} \pm t^* \times s/\sqrt n
+$$
+--
+
+```{r}
+stats <- theses %>%
+  summarize(n     = n(),
+            x_bar = mean(checkouts),
+            s     = sd(checkouts))
+stats$x_bar + c(1, -1) * qt(.025, df = stats$n - 1) *
+  stats$s / sqrt(stats$n)
+```
+
+
+---
+class:small
+**Question 1**: What is the average number of times a thesis is checked out? (Inference) 
+
+**Confidence interval on one mean (computational method)**
+
+--
+
+```{r}
+se_boot <- theses %>%
+  specify(response = checkouts) %>%
+  generate(500, type = "bootstrap") %>%
+  calculate(stat = "mean") %>%
+  summarize(sd(stat)) %>% 
+  pull()
+```
+
+--
+
+```{r}
+stats$x_bar + c(-1, 1) * 2 * se_boot
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Description)
+
+--
+```{r, fig.height = 5}
+ggplot(theses, aes(x = year)) +
+  geom_histogram() +
+  theme_bw(base_size = 18)
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+--
+
+**Chi-squared goodness of fit test **
+
+```{r, fig.width=7, fig.height=4, eval = FALSE}
+bd <- data.frame(year_binned =
+                   cut(theses$year, seq(from = 1920, 
+                                        to = 2020, 
+                                        by = 10)))
+ggplot(bd, aes(x = year_binned)) +
+  geom_bar() +
+  geom_hline(yintercept = stats$n/10, 
+             color = "goldenrod", lwd = 2) +
+  theme_bw(base_size = 18)
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test **
+
+```{r, fig.width=7, fig.height=6, echo = FALSE}
+bd <- data.frame(year_binned =
+                   cut(theses$year, seq(from = 1920, 
+                                        to = 2020, 
+                                        by = 10)))
+ggplot(bd, aes(x = year_binned)) +
+  geom_bar() +
+  geom_hline(yintercept = stats$n/10, 
+             color = "goldenrod", lwd = 2) +
+  theme_bw(base_size = 18)
+```
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test **
+
+--
+
+```{r}
+(obs <- table(bd$year_binned))
+```
+
+--
+
+```{r}
+(exp <- length(bd$year_binned)/10)
+```
+
+--
+
+```{r}
+(chisq_obs <- sum((obs - exp)^2/exp))
+```
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test (approximation method) **
+
+```{r}
+pchisq(chisq_obs, df = length(obs) - 1, lower.tail = FALSE)
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test (computational method) **
+
+```{r}
+levels(bd$year_binned) <- 1:10
+null <- bd %>%
+  specify(response = year_binned) %>%
+  hypothesize(null = "point", p = c("1" = .1, 
+                                    "2" = .1,
+                                    "3" = .1,
+                                    "4" = .1,
+                                    "5" = .1,
+                                    "6" = .1,
+                                    "7" = .1,
+                                    "8" = .1,
+                                    "9" = .1,
+                                    "10" = .1)) %>%
+  generate(500, type = "simulate") %>%
+  calculate(stat = "Chisq")
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test (computational method) **
+
+```{r fig.height = 4.5}
+library(ggthemes)
+visualize(null) +
+  shade_p_value(obs_stat = chisq_obs, direction = "right") +
+  theme_economist()
+```
+
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts? (Description)
+
+--
+
+```{r}
+head(theses)
+```
+
+--
+
+```{r}
+theses <- theses %>%
+  mutate(age = 2017 - year)
+head(theses)
+```
+
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts?  (Description)
+
+```{r fig.height = 5}
+ggplot(theses, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18)
+```
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts? (Inference)
+
+--
+
+```{r}
+m1 <- lm(checkouts ~ age, data = theses)
+summary(m1)
+```
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts? (Inference)
+
+```{r fig.height = 5}
+ggplot(theses, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18) +
+  stat_smooth(method = "lm", se = FALSE, lwd = 2)
+```
+
+
+---
+
+boardwork
+
+
+
+---
+class:small
+# Poisson Regression
+--
+
+```{r}
+m2 <- glm(checkouts ~ age, data = theses, family = "poisson")
+summary(m2)
+```
+
+---
+class:small
+
+```{r fig.height = 5}
+ggplot(theses, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18) +
+  stat_function(fun = function(age) {exp(coef(m2)[1] + 
+                                           coef(m2)[2] * age)},
+                color = "red", lwd = 2)
+```
+
+---
+class:small
+
+```{r}
+t2 <- theses %>%
+  filter(year > 1994)
+m2 <- glm(checkouts ~ age, data = t2, family = "poisson")
+summary(m2)
+```
+
+---
+class:small
+```{r fig.height = 5}
+ggplot(t2, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18) +
+  stat_function(fun = function(age) {exp(coef(m2)[1] + 
+                                           coef(m2)[2] * age)},
+                color = "red", lwd = 2)
+```
+
+<!-- --- -->
+<!-- # From the library's database... -->
+
+<!-- -- -->
+
+<!-- ```{r} -->
+<!-- theses_lib <- read.csv("../data/library_theses.csv") -->
+<!-- head(theses_lib) -->
+<!-- ``` -->
+
+
+<!-- --- -->
+
+<!-- **Question 1**: What is the average number of times a thesis is checked out? -->
+
+<!-- ```{r, fig.height=3, fig.width=5, fig.align='center'} -->
+<!-- qplot(x = checkouts, data = theses_lib, geom = "bar") -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- theses_lib %>% -->
+<!--   summarize(mean(checkouts), -->
+<!--             median(checkouts)) -->
+<!-- ``` -->
+
+
+<!-- --- -->
+
+<!-- **Question 2**: Is the distribution of theses uniform in time? -->
+
+<!-- ```{r} -->
+<!-- qplot(x = year, data = theses_lib, geom = "histogram") -->
+<!-- ``` -->
+
+
+<!-- --- -->
+
+<!-- **Question 3**: What is the relationship between the age of a thesis and the number of checkouts? -->
+
+<!-- ```{r} -->
+<!-- theses_lib <- theses_lib %>% -->
+<!--   mutate(age = 2017 - year) -->
+<!-- qplot(x = age, y = checkouts, data = theses_lib, geom = "jitter") -->
+<!-- ``` -->
+
+
+<!-- --- -->
+<!-- # Poisson Regression -->
+<!-- -- -->
+
+<!-- ```{r} -->
+<!-- t3 <- theses_lib %>% -->
+<!--   filter(year > 1994) -->
+<!-- m3 <- glm(checkouts ~ age, data = t3, family = "poisson") -->
+<!-- summary(m3) -->
+<!-- ``` -->
+
+
+<!-- --- -->
+
+<!-- ```{r} -->
+<!-- qplot(x = age, y = checkouts, data = t3, geom = "jitter") + -->
+<!--   stat_function(fun = function(age) {exp(coef(m3)[1] + coef(m3)[2] * age)}, -->
+<!--                 color = "red") -->
+<!-- ``` -->
+
+<!-- --- -->
+<!-- # How'd we do? -->
+
+<!-- ```{r} -->
+<!-- coef(m2) # our data -->
+<!-- coef(m3) # library's data -->
+<!-- ``` -->
+
+

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Modeling Senior Theses</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/fc-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="reed.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Modeling Senior Theses
+
+---
+
+
+
+
+# Case study: senior theses
+
+
+```r
+theses &lt;- read.csv("../data/sample_theses.csv")
+str(theses)
+```
+
+```
+## 'data.frame':	724 obs. of  3 variables:
+##  $ year     : int  1984 2004 1939 1992 1941 1989 1993 2010 1998 1967 ...
+##  $ checkouts: int  3 2 1 1 0 0 0 1 1 7 ...
+##  $ division : Factor w/ 5 levels "ARTS","HSS","LL",..: 2 3 5 5 2 2 4 3 2 5 ...
+```
+
+
+---
+class:small
+**Question 1**: What is the average number of times a thesis is checked out? (Description)
+
+--
+
+
+```r
+ggplot(theses, aes(x = checkouts)) +
+  geom_bar() +
+  theme_bw(base_size = 18) 
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+
+
+```r
+theses %&gt;%
+  summarize(mean(checkouts),
+            median(checkouts))
+```
+
+```
+##   mean(checkouts) median(checkouts)
+## 1        1.668508                 1
+```
+
+
+---
+class:small
+**Question 1**: What is the average number of times a thesis is checked out? (Inference) 
+
+--
+
+**Confidence interval on one mean (approximation method)**
+
+$$
+\bar{x} \pm t^* \times s/\sqrt n
+$$
+--
+
+
+```r
+stats &lt;- theses %&gt;%
+  summarize(n     = n(),
+            x_bar = mean(checkouts),
+            s     = sd(checkouts))
+stats$x_bar + c(1, -1) * qt(.025, df = stats$n - 1) *
+  stats$s / sqrt(stats$n)
+```
+
+```
+## [1] 1.479991 1.857025
+```
+
+
+---
+class:small
+**Question 1**: What is the average number of times a thesis is checked out? (Inference) 
+
+**Confidence interval on one mean (computational method)**
+
+--
+
+
+```r
+se_boot &lt;- theses %&gt;%
+  specify(response = checkouts) %&gt;%
+  generate(500, type = "bootstrap") %&gt;%
+  calculate(stat = "mean") %&gt;%
+  summarize(sd(stat)) %&gt;% 
+  pull()
+```
+
+--
+
+
+```r
+stats$x_bar + c(-1, 1) * 2 * se_boot
+```
+
+```
+## [1] 1.474071 1.862946
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Description)
+
+--
+
+```r
+ggplot(theses, aes(x = year)) +
+  geom_histogram() +
+  theme_bw(base_size = 18)
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+--
+
+**Chi-squared goodness of fit test **
+
+
+```r
+bd &lt;- data.frame(year_binned =
+                   cut(theses$year, seq(from = 1920, 
+                                        to = 2020, 
+                                        by = 10)))
+ggplot(bd, aes(x = year_binned)) +
+  geom_bar() +
+  geom_hline(yintercept = stats$n/10, 
+             color = "goldenrod", lwd = 2) +
+  theme_bw(base_size = 18)
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test **
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test **
+
+--
+
+
+```r
+(obs &lt;- table(bd$year_binned))
+```
+
+```
+## 
+## (1.92e+03,1.93e+03] (1.93e+03,1.94e+03] (1.94e+03,1.95e+03] 
+##                   3                  21                  25 
+## (1.95e+03,1.96e+03] (1.96e+03,1.97e+03] (1.97e+03,1.98e+03] 
+##                  27                  54                  79 
+## (1.98e+03,1.99e+03]    (1.99e+03,2e+03]    (2e+03,2.01e+03] 
+##                 119                 123                 166 
+## (2.01e+03,2.02e+03] 
+##                 106
+```
+
+--
+
+
+```r
+(exp &lt;- length(bd$year_binned)/10)
+```
+
+```
+## [1] 72.4
+```
+
+--
+
+
+```r
+(chisq_obs &lt;- sum((obs - exp)^2/exp))
+```
+
+```
+## [1] 369.7541
+```
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test (approximation method) **
+
+
+```r
+pchisq(chisq_obs, df = length(obs) - 1, lower.tail = FALSE)
+```
+
+```
+## [1] 3.851317e-74
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test (computational method) **
+
+
+```r
+levels(bd$year_binned) &lt;- 1:10
+null &lt;- bd %&gt;%
+  specify(response = year_binned) %&gt;%
+  hypothesize(null = "point", p = c("1" = .1, 
+                                    "2" = .1,
+                                    "3" = .1,
+                                    "4" = .1,
+                                    "5" = .1,
+                                    "6" = .1,
+                                    "7" = .1,
+                                    "8" = .1,
+                                    "9" = .1,
+                                    "10" = .1)) %&gt;%
+  generate(500, type = "simulate") %&gt;%
+  calculate(stat = "Chisq")
+```
+
+
+---
+class:small
+**Question 2**: Is the distribution of theses uniform in time? (Inference)
+
+**Chi-squared goodness of fit test (computational method) **
+
+
+```r
+library(ggthemes)
+visualize(null) +
+  shade_p_value(obs_stat = chisq_obs, direction = "right") +
+  theme_economist()
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts? (Description)
+
+--
+
+
+```r
+head(theses)
+```
+
+```
+##   year checkouts division
+## 1 1984         3      HSS
+## 2 2004         2       LL
+## 3 1939         1     PRPL
+## 4 1992         1     PRPL
+## 5 1941         0      HSS
+## 6 1989         0      HSS
+```
+
+--
+
+
+```r
+theses &lt;- theses %&gt;%
+  mutate(age = 2017 - year)
+head(theses)
+```
+
+```
+##   year checkouts division age
+## 1 1984         3      HSS  33
+## 2 2004         2       LL  13
+## 3 1939         1     PRPL  78
+## 4 1992         1     PRPL  25
+## 5 1941         0      HSS  76
+## 6 1989         0      HSS  28
+```
+
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts?  (Description)
+
+
+```r
+ggplot(theses, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18)
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts? (Inference)
+
+--
+
+
+```r
+m1 &lt;- lm(checkouts ~ age, data = theses)
+summary(m1)
+```
+
+```
+## 
+## Call:
+## lm(formula = checkouts ~ age, data = theses)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.0341 -1.6141 -0.6653  0.4064 19.2220 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.527038   0.158518   9.633   &lt;2e-16 ***
+## age         0.005122   0.004567   1.122    0.262    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.583 on 722 degrees of freedom
+## Multiple R-squared:  0.001739,	Adjusted R-squared:  0.0003566 
+## F-statistic: 1.258 on 1 and 722 DF,  p-value: 0.2624
+```
+
+---
+class:small
+**Question 3**: What is the relationship between the age of a thesis and the number of checkouts? (Inference)
+
+
+```r
+ggplot(theses, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18) +
+  stat_smooth(method = "lm", se = FALSE, lwd = 2)
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+boardwork
+
+
+
+---
+class:small
+# Poisson Regression
+--
+
+
+```r
+m2 &lt;- glm(checkouts ~ age, data = theses, family = "poisson")
+summary(m2)
+```
+
+```
+## 
+## Call:
+## glm(formula = checkouts ~ age, family = "poisson", data = theses)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.0300  -1.7962  -0.5550   0.3091   8.0823  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) 0.427501   0.048115   8.885   &lt;2e-16 ***
+## age         0.002984   0.001331   2.242   0.0249 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 2117.9  on 723  degrees of freedom
+## Residual deviance: 2113.0  on 722  degrees of freedom
+## AIC: 3251.8
+## 
+## Number of Fisher Scoring iterations: 6
+```
+
+---
+class:small
+
+
+```r
+ggplot(theses, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18) +
+  stat_function(fun = function(age) {exp(coef(m2)[1] + 
+                                           coef(m2)[2] * age)},
+                color = "red", lwd = 2)
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class:small
+
+
+```r
+t2 &lt;- theses %&gt;%
+  filter(year &gt; 1994)
+m2 &lt;- glm(checkouts ~ age, data = t2, family = "poisson")
+summary(m2)
+```
+
+```
+## 
+## Call:
+## glm(formula = checkouts ~ age, family = "poisson", data = t2)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.1820  -1.3725  -0.4017   0.6289   4.3983  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -0.277988   0.102643  -2.708  0.00676 ** 
+## age          0.054541   0.007247   7.526 5.24e-14 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 689.91  on 350  degrees of freedom
+## Residual deviance: 631.55  on 349  degrees of freedom
+## AIC: 1195.1
+## 
+## Number of Fisher Scoring iterations: 5
+```
+
+---
+class:small
+
+```r
+ggplot(t2, aes(x = age, y = checkouts)) +
+  geom_jitter() +
+  theme_bw(base_size = 18) +
+  stat_function(fun = function(age) {exp(coef(m2)[1] + 
+                                           coef(m2)[2] * age)},
+                color = "red", lwd = 2)
+```
+
+&lt;img src="modeling-senior-theses-poisson_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # From the library's database... --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- theses_lib &lt;- read.csv("../data/library_theses.csv") --&gt;
+&lt;!-- head(theses_lib) --&gt;
+&lt;!-- ``` --&gt;
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- **Question 1**: What is the average number of times a thesis is checked out? --&gt;
+
+&lt;!-- ```{r, fig.height=3, fig.width=5, fig.align='center'} --&gt;
+&lt;!-- qplot(x = checkouts, data = theses_lib, geom = "bar") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- theses_lib %&gt;% --&gt;
+&lt;!--   summarize(mean(checkouts), --&gt;
+&lt;!--             median(checkouts)) --&gt;
+&lt;!-- ``` --&gt;
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- **Question 2**: Is the distribution of theses uniform in time? --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- qplot(x = year, data = theses_lib, geom = "histogram") --&gt;
+&lt;!-- ``` --&gt;
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- **Question 3**: What is the relationship between the age of a thesis and the number of checkouts? --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- theses_lib &lt;- theses_lib %&gt;% --&gt;
+&lt;!--   mutate(age = 2017 - year) --&gt;
+&lt;!-- qplot(x = age, y = checkouts, data = theses_lib, geom = "jitter") --&gt;
+&lt;!-- ``` --&gt;
+
+
+&lt;!-- --- --&gt;
+&lt;!-- # Poisson Regression --&gt;
+&lt;!-- -- --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- t3 &lt;- theses_lib %&gt;% --&gt;
+&lt;!--   filter(year &gt; 1994) --&gt;
+&lt;!-- m3 &lt;- glm(checkouts ~ age, data = t3, family = "poisson") --&gt;
+&lt;!-- summary(m3) --&gt;
+&lt;!-- ``` --&gt;
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- qplot(x = age, y = checkouts, data = t3, geom = "jitter") + --&gt;
+&lt;!--   stat_function(fun = function(age) {exp(coef(m3)[1] + coef(m3)[2] * age)}, --&gt;
+&lt;!--                 color = "red") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # How'd we do? --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- coef(m2) # our data --&gt;
+&lt;!-- coef(m3) # library's data --&gt;
+&lt;!-- ``` --&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "atelier-forest-light",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
